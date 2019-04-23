@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>项目总结 -- webAr建筑管理系统 | Fy的个人小站</title>
+<meta name="description" content="斯人若彩虹,遇上方知有">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1555985757211">
+<link rel="stylesheet" href="https://toxicfy.github.io//styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://toxicfy.github.io/">
+        <img src="https://toxicfy.github.io//images/avatar.png?v=1555985757211" class="site-logo">
+        <h1 class="site-title">Fy的个人小站</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      斯人若彩虹,遇上方知有
+    </div>
+    <div class="site-footer">
+      © 2018-2019 · @fy - 一个程序员的小窝
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">项目总结 -- webAr建筑管理系统</h2>
+            <div class="post-date">2019-01-23</div>
+            
+              <div class="feature-container" style="background-image: url('https://toxicfy.github.io//post-images/webar-managementSystem.jpg')">
+              </div>
+            
+            <div class="post-content">
+              <blockquote>
+<p>其实这里有点标题党的嫌疑，其实这个项目在一月初的时间已经完成了，因为是 <code>webAr</code> 项目的初始应用（没有使用打包工具和 cli ），加上业务逻辑很复杂，所以这里实际上是基于 <code>Vue-li</code>下对于项目的总结</p>
+</blockquote>
+<!-- more --> 
+<h3 id="错误-class-constructor-funname-cannot-be-invoked-without-new">错误 : <code>Class constructor FunName cannot be invoked without 'new'</code></h3>
+<ul>
+<li><strong>起由</strong>：直接调用的父类的时候无法使用子类继承，只能通过 <code>new</code> 的方式，即: 无法使用已转换的类扩展本机类</li>
+<li><strong>方法</strong>：修改<code>.babelrc</code> - 排除 <code>transform-es2015-classes</code></li>
+</ul>
+<pre><code class="language-javascript">// &lt;!-- 参考：https://stackoverflow.com/questions/36577683/babel-error-class-constructor-foo-cannot-be-invoked-without-new --&gt;
+presets: [
+    [&quot;env&quot;, {
+        exclude: [&quot;transform-es2015-classes&quot;]
+    }]
+]
+</code></pre>
+<h3 id="功能-添加-css2dlabel-进行场景的特殊标注">功能 : 添加 <code>css2DLabel</code> 进行场景的特殊标注</h3>
+<ul>
+<li><strong>起由</strong>: 添加 <code>css2D</code> 层 <code>canvas</code> 无法使用定义好的事件；</li>
+<li><strong>方法</strong>：修改 <code>css2D</code> 的 <code>z-index</code> ，并需要传递已定义的事件</li>
+</ul>
+<pre><code class="language-javascript">is_render = true;
+
+//初始化css2DRender &amp;&amp; Dom style
+let css2DRender = new THREE.CSS2DRenderer(viewer);
+initCSS2DRender(css2DRenderer);
+
+// 赋值事件，添加Dom
+css2DRender.domElement.ondbclick = () =&gt; {
+    terrain.methods.dbFinishToolEvents
+};
+css2DRender.domElement.onclick = () =&gt; {
+    terrain.methods.FinishToolEvents
+};
+document.getElementById(&quot;container&quot;).appendChild(css2DRenderer.domElement);
+
+// 场景更新
+viewer.onEndRenderTechnique = () =&gt; {
+    if (is_render) {
+        css2DRenderer.render(scene, camera)
+    }
+}
+</code></pre>
+<h3 id="关于-css2dlabellayer-的-addlabel-方法的改写">关于 <code>css2DLabelLayer</code> 的 <code>addLabel</code> 方法的改写:</h3>
+<blockquote>
+<p>通过 imgconfig 参数配置的传递生成 ImgIcon 部分</p>
+</blockquote>
+<pre><code class="language-javascript">// dom 添加 imgIcon
+labelDiv.appendChild(getCSS2DIcon(imgconfig));
+
+/**
+ * 生成 ImgIcon
+ * @param {Object} config - 用于生成 ImgIcon 的配置
+ * @returns Image Dom
+ */
+function getCSS2DIcon(config) {
+  let CSS2D_IMGCONFIG;
+  config ? CSS2D_IMGCONFIG = config : CSS2D_IMGCONFIG = {
+    src: '/static/img/position.gif',
+    width: &quot;30px&quot;,
+    height: &quot;40px&quot;,
+    position: &quot;absolute&quot;,
+    top: &quot;24px&quot;,
+    left: &quot;32%&quot;
+  };
+
+  let imgIcon = new Image();
+  imgIcon.src = CSS2D_IMGCONFIG.src;
+  Object.assign(imgIcon.style, CSS2D_IMGCONFIG);
+
+  return imgIcon;
+}
+</code></pre>
+<pre><code class="language-javascript">//在创建css2DLayer的时：利用 dom 生成 cssLabel
+let cssLabel = new THREE.CSS2DObject(labelDiv);
+cssLabel.heightRatio = 5; // 设定 heightRatio (4-使用gif中心为旋转的点)
+this.add(cssLabel);  //此处的this是 CSS2DLabelLayer 类
+</code></pre>
+<h3 id="功能在对canvas上进行事件监听的用于满足逻辑通常是工具类的自动关闭">功能：在对canvas上进行事件监听的用于满足逻辑（通常是工具类的自动关闭）</h3>
+<pre><code class="language-javascript">//Html Dom
+// &lt;canvas id=&quot;canvasView&quot; @click=&quot;finishToolsEvent&quot; @dblclick=&quot;dbFinishToolsEvent&quot;&gt;&lt;/canvas&gt;
+
+//JS methods
+finishToolsEvent(timeout = 300){
+  if(this.clickTimer){
+      window.clearTimeout(this.clickTimer)；
+      this.clickTimer = null;
+  }
+
+  this.clickTimer = window.setTimeOut(() =&gt; {
+    // do something single click
+  },timeout)
+}，
+dbFinishToolsEvent(){
+	if (this.clickTimer) {
+    window.clearTimeout(this.clickTimer);
+      this.clickTimer = null;
+  }
+  //do something dbclick
+}
+</code></pre>
+<h3 id="功能-对于一些加载时间比较久的组件不希望功能切换的时候状态丢失">功能 : 对于一些加载时间比较久的组件，不希望功能切换的时候状态丢失；</h3>
+<ul>
+<li><strong>方法</strong>：使用<code>vue-router</code>的 <code>keep-alive</code> 保持加载完成的状态；</li>
+</ul>
+<pre><code class="language-java">//vue component
+&lt;keep-alive&gt;
+     &lt;router-view v-if='$router.meta.keep_alive'&gt;&lt;/router-view&gt;
+&lt;/keep-alive&gt;
+&lt;router-view v-if='!$router.meta.keep_alive'&gt;&lt;/router-view&gt;
+</code></pre>
+<pre><code class="language-javascript">// router/index.js
+export default new Router({
+    route: [{
+        // ....   
+        children: [{
+            path: './SatelliteImgContrast',
+            component: resolve =&gt; require(['@components/satelliteImgContrast'], resolve),
+            meta: {
+                title: 'xx',
+                keep_alive: true
+            }
+        }]
+    }]
+})
+</code></pre>
+<h3 id="基于-vuex-的数据管理">基于 Vuex 的数据管理</h3>
+<p><code>store</code> 在 <code>Vue-cli</code>的组织结构如下</p>
+<pre><code>├── index.html
+├── main.js
+├── components
+└── store
+    ├── index.js          #  组装模块并导出 store
+    ├── state.js          #  state (存储状态)
+    ├── getters.js        #  getter (派生状态)
+    ├── mutation-types.js #  constant (状态修改类型)
+    ├── mutations.js      #  mutation (提交状态修改)
+    ├── actions.js        #  action (异步操作 - 提交mutation)
+</code></pre>
+<p>可以提及一下的是：</p>
+<ul>
+<li><code>mutation-type.js</code> 是单独存放 <code>mutation</code> 的类型存在的，和 <code>mutation</code> 配合使用的</li>
+</ul>
+<p>Example：</p>
+<pre><code class="language-javascript">// mutation-type.js
+export const SET_ALLLAYER_DATA = &quot;SET_ALLLAYER_DATA&quot;;
+export const DEL_DREWLAYER_DATA = &quot;DEL_DREWLAYER_DATA&quot;;
+
+// mutation.js
+import * as types from './mutation-type.js';
+
+export default {
+    [types.SET_ALLLAYER_DATA](state, {name, data}) {
+        state.layerData[name] = data;
+    },
+    [types.DEL_DREWLAYER_DATA](state, uuid) {
+        state.layerData.forEach((ele, i, arr) =&gt; {
+            if (ele.uuid === uuid) arr.splice(index, 1)
+        })
+    }
+}
+
+</code></pre>
+<ul>
+<li><code>action</code> 提供异步操作，并提交 <code>mutation</code></li>
+</ul>
+<p><code>action</code> 第一个参数默认是和 <code>store</code> 具有相同参数属性的对象。实际上 <code>action</code> 不具有修改 <code>state</code> 的能力，依旧通过提交（触发）<code>mutation</code> 实现修改；</p>
+<pre><code class="language-javascript">// store.dispatch(actionType)
+// action.js
+import * as types from './mutation-type.js';
+
+export default {
+  actionExample({ commit }, { uuid, name, data }) {
+    commit(types.DEL_DREWLAYER_DATA, uuid);
+    commit({ type: types.SET_ALLLAYER_DATA, name, data });
+  }
+};
+</code></pre>
+<ul>
+<li>辅助函数 <code>mapState/mapGetters/mapMutations/mapActions</code></li>
+</ul>
+<p>当需要在组件中引用的方法或者属性较多的时候我们使用辅助函数帮助我们实现, 对象展开运算符把我们需要的属性和方法映射到到对应的父级（vue属性）；</p>
+<pre><code class="language-javascript">// 几种不同的方式
+import {mapGetters, mapMutations, mapActions} from 'vuex';
+export default {
+    computed: {
+        ...mapGetters(['getLayerData','getDrawLayerData']),//名称与 state 的子节点名称相同时
+        ...mapState({
+          excavateData: state =&gt; state.excavate.data
+        })
+    },
+    methods: {
+        ...mapMutations({
+            setData: 'SET_ALLLAYER_DATA',//另取一个名字，使用对象形式
+            deleteDrawData: 'DEL_DREWLAYER_DATA'
+        }),
+        ...mapActions([ actionExample ])
+    }
+};
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://toxicfy.github.io//tag/front-end" class="tag">
+                    前端
+                  </a>
+                
+                  <a href="https://toxicfy.github.io//tag/project-summary" class="tag">
+                    项目总结
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://toxicfy.github.io//post/smartBridge">
+                  <h3 class="post-title">
+                    项目总结 -- 智慧桥梁
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '972d46b2bdee9b64974d',
+        clientSecret: '1e1d55e34cefa26773f1e9490300ca5d08bb13b9',
+        repo: 'toxicfy.github.io',
+        owner: 'fy',
+        admin: ['fy'],
+        id: location.pathname,      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

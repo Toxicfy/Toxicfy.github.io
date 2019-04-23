@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>项目总结 -- 智慧桥梁 | Fy的个人小站</title>
+<meta name="description" content="斯人若彩虹,遇上方知有">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1555985757211">
+<link rel="stylesheet" href="https://toxicfy.github.io//styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://toxicfy.github.io/">
+        <img src="https://toxicfy.github.io//images/avatar.png?v=1555985757211" class="site-logo">
+        <h1 class="site-title">Fy的个人小站</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      斯人若彩虹,遇上方知有
+    </div>
+    <div class="site-footer">
+      © 2018-2019 · @fy - 一个程序员的小窝
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">项目总结 -- 智慧桥梁</h2>
+            <div class="post-date">2018-03-14</div>
+            
+              <div class="feature-container" style="background-image: url('https://toxicfy.github.io//post-images/smartBridge.png')">
+              </div>
+            
+            <div class="post-content">
+              <blockquote>
+<p>项目中总结出一些常见问题，顺便熟悉开发中出现的<code>API</code>；</p>
+</blockquote>
+<!-- more --> 
+<p>smartBridge's  tips：</p>
+<h2 id="操作iframe后点击模型后出现的闪烁问题">操作iframe后点击模型后出现的闪烁问题</h2>
+<blockquote>
+<p>解决方法： 改变焦点事件</p>
+</blockquote>
+<ol>
+<li>
+<p>在模型队形的html上加入 <code>onmouseover=&quot;changeFocus()&quot;</code>；</p>
+</li>
+<li>
+<p>js中定义并执行一个无意义的点击操作</p>
+<pre><code class="language-javascript"> function changeFocus() {
+    $('.test').click();
+ }
+</code></pre>
+</li>
+</ol>
+<!-- more -->
+<h2 id="视图中定位方法的实现">视图中定位方法的实现</h2>
+<blockquote>
+<p>需要定位到的位置坐标(x,y,z)</p>
+</blockquote>
+<pre><code class="language-javascript">function position(x, y, z) {
+    var vec3 = VirtualRealityCtrl.UtilManager.CreateInstance(&quot;Vertex&quot;);//创建病害坐标;
+    vec3.X = x;
+    vec3.Y = y;
+    vec3.Z = z;
+    var normalview = VirtualRealityCtrl.ViewerManager.GetView(0);  //拿到标准视图对象
+    normalview.SetPosition(vec3, 80, 1);//以标准视图的视角定位到视图的中心点（坐标，高度，过渡时间）
+}
+</code></pre>
+<h2 id="植入模型后无法释放工具反复添加">植入模型后无法释放工具，反复添加</h2>
+<blockquote>
+<p>给定一个标识状态（目前不知道为什么加了就可以了）</p>
+</blockquote>
+<pre><code class="language-javascript">var flagModel = false;   //给定一个状态
+
+{ 
+  //模型添加触发事件
+  flagModel = true;
+  //获取到模型的url = ？？
+  VirtualRealityCtrl.ToolManager.ActiveTool = 5;    //切换为点击事件
+  VirtualRealityCtrl.attachEvent(&quot;ToolEvent&quot;, ToolEventAddModel); //ar注册事件
+}
+
+function ToolEventAddModel(id, type, data) {
+    var obj = JSON.parse(data);
+    if (flagModel) {
+        AR.Tool.AddModel(url, obj[1]); //obj[1]是坐标信息集合
+        flagModel = false;
+    }
+    if (obj.ID != &quot;&quot;) {
+        VirtualRealityCtrl.ToolManager.ReleaseActiveTool(); //释放点击的状态
+    }
+}
+</code></pre>
+<h2 id="视图中添加模型非种植的一些操作">视图中添加&quot;模型&quot;（非种植的）一些操作</h2>
+<blockquote>
+<p>这里用智慧桥梁中的病害信息为例</p>
+</blockquote>
+<ul>
+<li>创建</li>
+</ul>
+<blockquote>
+<p>实际上病害的创建是创建文本模型</p>
+</blockquote>
+<pre><code class="language-javascript">var txt = VirtualRealityCtrl.ModelManager.CreateTextModelParam();
+var vec3 = VirtualRealityCtrl.UtilManager.CreateInstance(&quot;Vertex&quot;);
+vec3.X = x;
+vec3.Y = y;
+vec3.Z = z;
+txt.Position = vec3;
+txt.Text = t;
+txt.ImagePath = basePath + imgUrl;
+var mod = VirtualRealityCtrl.ModelManager.CreateTextModel(txt); //创建传感器说明
+mod.ShowDirScreen = true;                                       //是否显示说明文字
+VirtualRealityCtrl.LayerManager.ModelLayer.AddNode(mod);        //添加到展示层
+arr.push({
+    KeyId: item[i].KeyId,         //keyID是用于非文本模型操作的标识（依据此的请求等）
+    ModId: mod.ID                 //mod.ID是获取该文本模型的标识
+});
+</code></pre>
+<ul>
+<li>删除</li>
+</ul>
+<blockquote>
+<p>依赖于创建时三维视图中的唯一标识ID</p>
+</blockquote>
+<pre><code class="language-javascript">if (arr != null) {
+    for (var i = 0; i &lt; arr.length; i++) {
+        var model = VirtualRealityCtrl.LayerManager.GetModelNodeByID(arr[i].ModId);
+        if (model != null) {
+            VirtualRealityCtrl.LayerManager.ModelLayer.DeleteNode(model);
+        }
+    }
+    arr = [];
+}
+</code></pre>
+<ul>
+<li>依据自定义<code>iD</code>字段请求</li>
+</ul>
+<blockquote>
+<p>在注册事件中进行判断当前操作的文本模型是哪一个<code>mod.id</code>？？ 然后通过这个再拿到<code>keyId</code>发起网络请求</p>
+</blockquote>
+<pre><code class="language-javascript">VirtualRealityCtrl.attachEvent(&quot;ToolEvent&quot;, ToolEvents); //AR中的注册事件
+
+function ToolEvents(id, type, data) {
+  	var obj = JSON.parse(data); 
+  	if (type == &quot;5&quot;) {
+      	//其他操作
+		$.ajax({
+          type: &quot;GET&quot;,
+          url: &quot;../data/JsonData/timeMachine.json&quot;,
+          success: function (data) {
+            //其他操作
+          }
+  	}
+}
+</code></pre>
+<h2 id="绘制挡板面">绘制挡板（面）</h2>
+<blockquote>
+<p>思路：通过将工具<code>type=4</code>，调出绘面工具，然后在注册事件中拿到对应的点的坐标</p>
+</blockquote>
+<ul>
+<li>拼接新的数组</li>
+</ul>
+<pre><code class="language-javascript">function ToolEvents(id, type, data) { 
+  var obj = JSON.parse(data);//data为数组坐标合集
+      if (type == &quot;4&quot;) {
+          for (var i = 0; i &lt; obj.length; i++) {
+              var tem = []
+              if (i &lt; obj.length - 1) {
+                  tem = [obj[i], obj[i + 1]]
+              } else {
+                  tem = [obj[i], obj[0]]
+              }
+              bottomPoint.push(tem)
+          }
+          VirtualRealityCtrl.ToolManager.ActiveTool = 0;
+          drawFace();
+   }
+}
+</code></pre>
+<pre><code class="language-javascript">//当时出现的问题在于：创建的时候把pgParam、vec3放在了循环外面
+function drawFace() {
+  for (var i = 0; i &lt; bottomPoint.length; i++) {
+      var pgParam = VirtualRealityCtrl.ModelManager.CreatePolygonModelParam(); //创建线面
+      var vec3 = VirtualRealityCtrl.UtilManager.CreateInstance(&quot;Vertex&quot;);
+      for (var j = 0; j &lt; bottomPoint[i].length; j++) {
+          vec3.X = bottomPoint[i][j].X;
+          vec3.Y = bottomPoint[i][j].Y;
+          vec3.Z = bottomPoint[i][j].Z;
+          pgParam.AddVertex(vec3);
+      }
+      var temArr = bottomPoint[i].reverse();
+      for (var k = 0; k &lt; temArr.length; k++) { //坐标变换
+          vec3.X = temArr[k].X;
+          vec3.Y = temArr[k].Y;
+          vec3.Z = temArr[k].Z + 5;
+          pgParam.AddVertex(vec3);
+      }
+      pgParam.FillColor = 03333;      //添加其他属性
+      pgParam.ShowSide = true;
+      pgParam.SideColor = 03333;
+      pgParam.SideWidth = 2;
+      var plmodel = VirtualRealityCtrl.ModelManager.CreatePolygonModel(pgParam);
+      plmodel.Transparency = 0.5;
+      VirtualRealityCtrl.LayerManager.ModelLayer.AddNode(plmodel);//添加到场景中
+      temArr = []; //清空临时数组
+  }
+  bottomPoint = [];
+}
+</code></pre>
+<h2 id="vue-复选框的使用">vue 复选框的使用</h2>
+<ul>
+<li>
+<p>单个复选框用于绑定布尔值</p>
+<pre><code class="language-java">&lt;input type=&quot;checkbox&quot; id=&quot;&quot;  v-model=&quot;checked&quot;&gt;  &lt;!-- checked = &quot;true&quot; or &quot;false&quot; --&gt;
+</code></pre>
+</li>
+<li>
+<p>多个复选框用于绑定数组（传入value值入数组）</p>
+<pre><code class="language-Java">&lt;input type=&quot;checkbox&quot; id=&quot;a&quot; value=&quot;John&quot; v-model=&quot;checkedNames&quot;&gt;
+&lt;label for=&quot;a&quot;&gt;John&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; id=&quot;b&quot; value=&quot;Mike&quot; v-model=&quot;checkedNames&quot;&gt;
+&lt;label for=&quot;b&quot;&gt;Mike&lt;/label&gt;
+&lt;!-- checkedNames为选中复选框的input对应value值的集合 --&gt;
+</code></pre>
+</li>
+</ul>
+<h2 id="ie11-下注册事件的兼容设置">IE11 下注册事件的兼容设置</h2>
+<blockquote>
+<p>Internet Explorer 11 默认情况下不支持 attachEvent 注册事件，需要在页面中修改默认兼容设置为IE10 才能使用 attachEvent 注册事件。 head中添加：</p>
+</blockquote>
+<pre><code class="language-java"> &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=10&quot; /&gt;
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://toxicfy.github.io//tag/front-end" class="tag">
+                    前端
+                  </a>
+                
+                  <a href="https://toxicfy.github.io//tag/project-summary" class="tag">
+                    项目总结
+                  </a>
+                
+              </div>
+            
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '972d46b2bdee9b64974d',
+        clientSecret: '1e1d55e34cefa26773f1e9490300ca5d08bb13b9',
+        repo: 'toxicfy.github.io',
+        owner: 'fy',
+        admin: ['fy'],
+        id: location.pathname,      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
