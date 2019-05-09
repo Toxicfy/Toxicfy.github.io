@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>关于 | Fy的个人小站</title>
+<title>项目维护 -- 历史违建处理模块 | Fy的个人小站</title>
 <meta name="description" content="斯人若彩虹,遇上方知有">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -97,14 +97,86 @@
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">关于</h2>
-            <div class="post-date">2019-01-25</div>
+            <h2 class="post-title">项目维护 -- 历史违建处理模块</h2>
+            <div class="post-date">2019-05-09</div>
+            
+              <div class="feature-container" style="background-image: url('https://toxicfy.github.io//post-images/xiang-mu-wei-hu-li-shi-wei-jian-chu-li-mo-kuai.jpeg')">
+              </div>
             
             <div class="post-content">
-              <p>这是关于的页面，可以在这里向世界介绍你！</p>
+              <p>这是项目维护期中需要添加的功能模块：其实可以算是在原有的系统上添加一个小型的管理系统了；这里从文件上传、iframe页面数据访问，数据渲染部分总结一下；</p>
+<!-- more -->
+<h1 id="数据渲染">数据渲染</h1>
+<h2 id="地图区域线条绘制">地图区域线条绘制</h2>
+<p>在编辑的时候从服务端请求到的点坐标集合在地图渲染，和新增共用一个地图； 但是操作逻辑不同，在新增是靠点击事件触发加载（第一次为加载，之后为显示隐藏），编辑需要直接渲染；</p>
+<pre><code class="language-javascript">$('#historyIllegaleModal').modal('show');
+
+$('#historyIllegaleModal').on('shown.bs.modal', e =&gt; {
+  if (vm.state === 'Edit') {
+    if (!viewer) {
+      vm.initWebGl(); //初始加载
+    }
+
+    $.extend(vm.commitData, data); // 依据服务端进行数据替换
+    vm.initChooseHistoryIllegaleArea(); // 显示 canvas 部分
+      
+    //加载完成的回调
+    viewer.onEndFrame = () =&gt; { 
+      if (historyIllegaleTableEditState) {
+        drawMeshLine(data['XQWZ']); //调用绘制的方法
+        historyIllegaleTableEditState = false; 
+      }
+    }
+    historyIllegaleTableEditState = true; //先执行
+  }
+})
+</code></pre>
+<h2 id="vue数据响应式更新">Vue数据响应式更新</h2>
+<p>由于 Vue 是在初始化实例时，将实例属性执行<code>getter/settter</code>对于已经创建的<code>vue</code>实例不允许动态添加跟级别的相应式属性。因为这样不会触发变化的监控，所以视图的更新无法自动刷新；</p>
+<blockquote>
+<p>使用 <code>Vue.set</code> 或者 <code>vm.$set</code>运行时候进行动态添加；</p>
+</blockquote>
+<pre><code class="language-javascript">vm.$set(object,propertyName,value);// 适用于后端数据返回后处理成自己需要的属性集合
+//eg: 向每个item添加自定义属性
+this.posts =  res.map( item =&gt; {
+    return { ...item, //somepropertyName }
+})
+</code></pre>
+<blockquote>
+<p>根节点数据初始化的时候全部添加</p>
+</blockquote>
+<pre><code class="language-javascript">data() {  // 当变量很多的时候，考虑分组后合并，避免混乱
+  const userInfo = { //....
+  };
+  const config = { //....
+  };
+  return { ...userInfo, ...config, }
+}
+</code></pre>
 
             </div>
             
+              <div class="tag-container">
+                
+                  <a href="https://toxicfy.github.io//tag/front-end" class="tag">
+                    前端
+                  </a>
+                
+                  <a href="https://toxicfy.github.io//tag/project-summary" class="tag">
+                    项目总结
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong">
+                  <h3 class="post-title">
+                    项目总结 -- webAr建筑管理系统
+                  </h3>
+                </a>
+              </div>
             
 
             
