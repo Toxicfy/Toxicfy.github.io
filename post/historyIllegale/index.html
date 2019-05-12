@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1557392206932">
+<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1557653860537">
 <link rel="stylesheet" href="https://toxicfy.github.io//styles/main.css">
 
 
@@ -35,7 +35,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://toxicfy.github.io/">
-        <img src="https://toxicfy.github.io//images/avatar.png?v=1557392206932" class="site-logo">
+        <img src="https://toxicfy.github.io//images/avatar.png?v=1557653860537" class="site-logo">
         <h1 class="site-title">Fy的个人小站</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -100,14 +100,14 @@
             <h2 class="post-title">项目维护 -- 历史违建处理模块</h2>
             <div class="post-date">2019-05-09</div>
             
-              <div class="feature-container" style="background-image: url('https://toxicfy.github.io//post-images/xiang-mu-wei-hu-li-shi-wei-jian-chu-li-mo-kuai.jpeg')">
+              <div class="feature-container" style="background-image: url('https://toxicfy.github.io//post-images/historyIllegale.jpeg')">
               </div>
             
             <div class="post-content">
               <p>这是项目维护期中需要添加的功能模块：其实可以算是在原有的系统上添加一个小型的管理系统了；这里从文件上传、iframe页面数据访问，数据渲染部分总结一下；</p>
 <!-- more -->
 <h1 id="数据渲染">数据渲染</h1>
-<h2 id="地图区域线条绘制">地图区域线条绘制</h2>
+<h3 id="地图区域线条绘制">地图区域线条绘制</h3>
 <p>在编辑的时候从服务端请求到的点坐标集合在地图渲染，和新增共用一个地图； 但是操作逻辑不同，在新增是靠点击事件触发加载（第一次为加载，之后为显示隐藏），编辑需要直接渲染；</p>
 <pre><code class="language-javascript">$('#historyIllegaleModal').modal('show');
 
@@ -131,7 +131,7 @@ $('#historyIllegaleModal').on('shown.bs.modal', e =&gt; {
   }
 })
 </code></pre>
-<h2 id="vue数据响应式更新">Vue数据响应式更新</h2>
+<h3 id="vue数据响应式更新">Vue数据响应式更新</h3>
 <p>由于 Vue 是在初始化实例时，将实例属性执行<code>getter/settter</code>对于已经创建的<code>vue</code>实例不允许动态添加跟级别的相应式属性。因为这样不会触发变化的监控，所以视图的更新无法自动刷新；</p>
 <blockquote>
 <p>使用 <code>Vue.set</code> 或者 <code>vm.$set</code>运行时候进行动态添加；</p>
@@ -152,6 +152,100 @@ this.posts =  res.map( item =&gt; {
   };
   return { ...userInfo, ...config, }
 }
+</code></pre>
+<h1 id="文件上传">文件上传</h1>
+<blockquote>
+<p>在使用过程中涉及到 Post 请求用于上传文件，，使用 <code>FormData</code> 进行文件上传；</p>
+</blockquote>
+<pre><code class="language-html">&lt;!-- type=file 代表上传文件  --&gt;
+&lt;!-- accept='' 代表上传文件限制，这里 .xls, .xlsx 代表限定为 excel类型 --&gt;
+&lt;input type=&quot;file&quot; name=&quot;&quot;  id=&quot;&quot; accept=&quot;.xls, .xlsx&quot; &gt;
+</code></pre>
+<p><code>FormData</code> 对象用以将数据编译成键值对，以便用 <code>XMLHttpRequest</code> 来发送数据，其中如果表单 <code>enctype</code> 属性设为 <code>multipart/form-data</code> ，则会使用表单的 <code>submit()</code> 方法来发送数据；</p>
+<pre><code class="language-javascript">var formData = new FormData();
+
+formData.append(&quot;name&quot;, &quot;tom&quot;);
+formData.append(&quot;num&quot;, 123); //数字123会被立即转换成字符串 &quot;123&quot;
+
+
+// 在jq使用 - 设置不处理数据及内容类型即可
+var formData = new FormData(document.querySelector(&quot;form&quot;));
+formData.append(&quot;file&quot;, fileInputElement.files[0]);
+$.ajax({
+  url: &quot;stash.php&quot;,
+  type: &quot;POST&quot;,
+  data: formData,
+  processData: false,  // 不处理数据
+  contentType: false   // 不设置内容类型
+  success(res){},
+});
+
+</code></pre>
+<p>在 vue 模板配合 axios 使用如下：</p>
+<pre><code class="language-html">&lt;template&gt;
+  &lt;div id=&quot;app&quot;&gt;
+    &lt;input id=&quot;fileinput&quot; @change=&quot;uploading($event)&quot; type=&quot;file&quot; accept=&quot;image/*&quot;&gt;
+    &lt;button @click.prevent=&quot;submit()&quot;&gt;&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  name: &quot;#app&quot;,
+  data() {
+    return { file: &quot;&quot;, src: &quot;&quot; };
+  },
+  methods: {
+    uploading(event) {
+      this.file = event.target.files[0]; //获取文件
+      var windowURL = window.URL || window.webkitURL;
+      this.file = event.target.files[0];
+      this.src = windowURL.createObjectURL(event.target.files[0]);//创建图片文件的url
+    },
+
+    submit() {
+      let formdata = new FormData();
+      formdata.append(&quot;file&quot;, this.file);
+      let config = {//此处必须设置为  multipart/form-data
+        headers: {
+          &quot;Content-Type&quot;: &quot;multipart/form-data&quot; //之前说的以表单传数据的格式来传递fromdata
+        }
+      };
+
+      this.$http.post(&quot;/upload&quot;, formData, config)
+        .then(res =&gt; {
+          //do something
+        })
+        .catch(error =&gt; {});
+    }
+  }
+};
+&lt;/script&gt;
+</code></pre>
+<h1 id="iframe页面数据访问">iframe页面数据访问</h1>
+<blockquote>
+<p>由于三维地图浏览功能和其他大部分逻辑无关，所以放置在一个新的 iframe 中进行业务逻辑编写； 但是数据获取传入以及调用，需要调用方法和给变量赋值；</p>
+</blockquote>
+<pre><code class="language-html">&lt;!-- parent.html --&gt;
+&lt;div class='iframeContainer'&gt;
+  &lt;iframe src='' id='myIframe'&gt;
+&lt;/div&gt;
+</code></pre>
+<pre><code class="language-javascript">//iframe.js
+var testValue;  // 因为我们从主页面获取的是 window 对象，所以我们使用 var 声明变量，以便于直接进行获取；
+
+function subFunction(){
+  //do something
+}
+
+
+// parent.js
+let childWindow = document.querySelector('#myIframe').contentWindows; //获取到子页面的 window 对象
+childWindow.testValue = 'changed' ; //修改
+childWindow.subFunction(); //执行子页面的方法
+
+
+// 对于子页面访问父页面则是可以通过`parent`即可访问到；
 </code></pre>
 
             </div>
