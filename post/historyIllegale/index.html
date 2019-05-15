@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1557653860537">
+<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1557892168543">
 <link rel="stylesheet" href="https://toxicfy.github.io//styles/main.css">
 
 
@@ -35,7 +35,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://toxicfy.github.io/">
-        <img src="https://toxicfy.github.io//images/avatar.png?v=1557653860537" class="site-logo">
+        <img src="https://toxicfy.github.io//images/avatar.png?v=1557892168543" class="site-logo">
         <h1 class="site-title">Fy的个人小站</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -130,6 +130,78 @@ $('#historyIllegaleModal').on('shown.bs.modal', e =&gt; {
     historyIllegaleTableEditState = true; //先执行
   }
 })
+</code></pre>
+<h3 id="卫片对比区域渲染">卫片对比区域渲染</h3>
+<p>在触发卫片对比功能中中依据主页面选中需要渲染的类型，其中绘制行政区划部分（为文字标注和区域划分两个部分）;</p>
+<p><img src="https://toxicfy.github.io//post-images/1557892099842.png" alt="process"></p>
+<blockquote>
+<p>构建标注图层</p>
+</blockquote>
+<pre><code class="language-javascript">  let shapeCommonConfig = {
+    width: &quot;76px&quot;,
+    height: &quot;24px&quot;,
+    padding: &quot;0&quot;,
+    borderRadius: &quot;2px&quot;,
+    color: &quot;#ff0000&quot;,
+    opacity: 1,
+    backgroundColor: &quot;none&quot;,
+    fontWeight: &quot;900&quot;,
+  };
+
+  let shapeArr = [streetShape, streetShapeRight, communityShape, communityShapeRight, jurisdictionShape, jurisdictionShapeRight];
+  shapeArr.forEach((shapeArrItem, index) =&gt; {
+    shapeArrItem = new CSS2DLabelLayer();  
+    Object.assign(shapeArrItem.css2DStyle, shapeCommonConfig);
+    index % 2 === 0 ? sceneRight.addCustomLayer(shapeArrItem) : sceneLeft.addCustomLayer(shapeArrItem);
+  })
+</code></pre>
+<blockquote>
+<p>利用数据集合渲染出边界线和其中的文字</p>
+</blockquote>
+<pre><code class="language-javascript">  // 边界线 &amp;&amp; 文字 添加
+  CITY_SHAPE_DATA.forEach((ele, curNum) =&gt; {
+    // 根据主页 props 确定 那些需要加载；
+    let currentState = parent.document.querySelector(`#cityshapes${curNum}`).checked;
+    if (!currentState) {
+      return;
+    }
+
+    let sceneArr = [sceneRight, sceneLeft];
+    for (let i = 0; i &lt; sceneArr.length; i++) {
+      const item = sceneArr[i];
+      var ftLayerPolygon = new tjh.ar.FeatureLayer(ele.url[0], &quot;&quot;, false, item.terrainLayers, item.globalOffset);
+      ftLayerPolygon.loadAllOnce = true;
+      // polygon
+      ftLayerPolygon.regulator.isLoadFeature = true;// 是否加载矢量streetSurface
+      ftLayerPolygon.regulator.requestNum = 10;// 每帧加载数量
+      ftLayerPolygon.regulator.color.set(Number(ele.setColor[0]));// 矢量颜色
+      ftLayerPolygon.regulator.opacity = (ele.type === &quot;community&quot;) ? 0.5 : 1;// 矢量透明度
+      ftLayerPolygon.regulator.size = 3.0;
+      // 矢量贴合方式--人工指定高层
+      ftLayerPolygon.regulator.fitPattern = tjh.ar.FeatureLayer.FIT_PATTERN.FIT_TERRIAN_LOW;
+      ftLayerPolygon.initMaterial();
+      item.addFeatureLayer(ftLayerPolygon); //向其中添加边界线
+
+      isRenderLabel = true; //触发封装库中的添加方法
+
+      let textConfig = [
+        { type: &quot;street&quot;, target: streetShape, target2: streetShapeRight },
+        { type: &quot;community&quot;, target: communityShape, target2: communityShapeRight },
+        { type: &quot;jurisdiction&quot;, target: jurisdictionShape, target2: jurisdictionShapeRight }
+      ];
+      textConfig.forEach(element =&gt; {
+        if (ele.type === element.type) {
+          let { target, target2 } = element;
+          for (let num = 0; num &lt; ele.centerPosition.length; num++) {
+            const { name, x, y } = ele.centerPosition[num];
+            target.addLabel(null, name, new THREE.Vector3(x, y, 50));
+            target2.addLabel(null, name, new THREE.Vector3(x, y, 50));
+          }
+        }
+      });
+    }
+  });
+
 </code></pre>
 <h3 id="vue数据响应式更新">Vue数据响应式更新</h3>
 <p>由于 Vue 是在初始化实例时，将实例属性执行<code>getter/settter</code>对于已经创建的<code>vue</code>实例不允许动态添加跟级别的相应式属性。因为这样不会触发变化的监控，所以视图的更新无法自动刷新；</p>
