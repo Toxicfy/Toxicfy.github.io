@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://toxicfy.github.io/</id>
+    <title>Fy的个人小站</title>
+    <updated>2019-07-04T06:06:42.823Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://toxicfy.github.io/"/>
+    <link rel="self" href="https://toxicfy.github.io//atom.xml"/>
+    <subtitle>斯人若彩虹,遇上方知有</subtitle>
+    <logo>https://toxicfy.github.io//images/avatar.png</logo>
+    <icon>https://toxicfy.github.io//favicon.ico</icon>
+    <rights>All rights reserved 2019, Fy的个人小站</rights>
+    <entry>
+        <title type="html"><![CDATA[项目维护 -- 历史违建处理模块]]></title>
+        <id>https://toxicfy.github.io//post/historyIllegale</id>
+        <link href="https://toxicfy.github.io//post/historyIllegale">
+        </link>
+        <updated>2019-05-09T08:26:58.000Z</updated>
+        <summary type="html"><![CDATA[<p>这是项目维护期中需要添加的功能模块：其实可以算是在原有的系统上添加一个小型的管理系统了；这里从文件上传、iframe页面数据访问，数据渲染部分总结一下；</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>这是项目维护期中需要添加的功能模块：其实可以算是在原有的系统上添加一个小型的管理系统了；这里从文件上传、iframe页面数据访问，数据渲染部分总结一下；</p>
+<!-- more -->
+<h1 id="数据渲染">数据渲染</h1>
+<h3 id="地图区域线条绘制">地图区域线条绘制</h3>
+<p>在编辑的时候从服务端请求到的点坐标集合在地图渲染，和新增共用一个地图； 但是操作逻辑不同，在新增是靠点击事件触发加载（第一次为加载，之后为显示隐藏），编辑需要直接渲染；</p>
+<pre><code class="language-javascript">$('#historyIllegaleModal').modal('show');
+
+$('#historyIllegaleModal').on('shown.bs.modal', e =&gt; {
+  if (vm.state === 'Edit') {
+    if (!viewer) {
+      vm.initWebGl(); //初始加载
+    }
+
+    $.extend(vm.commitData, data); // 依据服务端进行数据替换
+    vm.initChooseHistoryIllegaleArea(); // 显示 canvas 部分
+      
+    //加载完成的回调
+    viewer.onEndFrame = () =&gt; { 
+      if (historyIllegaleTableEditState) {
+        drawMeshLine(data['XQWZ']); //调用绘制的方法
+        historyIllegaleTableEditState = false; 
+      }
+    }
+    historyIllegaleTableEditState = true; //先执行
+  }
+})
+</code></pre>
+<h3 id="卫片对比区域渲染">卫片对比区域渲染</h3>
+<p>在触发卫片对比功能中中依据主页面选中需要渲染的类型，其中绘制行政区划部分（为文字标注和区域划分两个部分）;</p>
+<p><img src="https://toxicfy.github.io//post-images/1557892099842.png" alt="process"></p>
+<blockquote>
+<p>构建标注图层</p>
+</blockquote>
+<pre><code class="language-javascript">  let shapeCommonConfig = {
+    width: &quot;76px&quot;,
+    height: &quot;24px&quot;,
+    padding: &quot;0&quot;,
+    borderRadius: &quot;2px&quot;,
+    color: &quot;#ff0000&quot;,
+    opacity: 1,
+    backgroundColor: &quot;none&quot;,
+    fontWeight: &quot;900&quot;,
+  };
+
+  let shapeArr = [streetShape, streetShapeRight, communityShape, communityShapeRight, jurisdictionShape, jurisdictionShapeRight];
+  shapeArr.forEach((shapeArrItem, index) =&gt; {
+    shapeArrItem = new CSS2DLabelLayer();  
+    Object.assign(shapeArrItem.css2DStyle, shapeCommonConfig);
+    index % 2 === 0 ? sceneRight.addCustomLayer(shapeArrItem) : sceneLeft.addCustomLayer(shapeArrItem);
+  })
+</code></pre>
+<blockquote>
+<p>利用数据集合渲染出边界线和其中的文字</p>
+</blockquote>
+<pre><code class="language-javascript">  // 边界线 &amp;&amp; 文字 添加
+  CITY_SHAPE_DATA.forEach((ele, curNum) =&gt; {
+    // 根据主页 props 确定 那些需要加载；
+    let currentState = parent.document.querySelector(`#cityshapes${curNum}`).checked;
+    if (!currentState) {
+      return;
+    }
+
+    let sceneArr = [sceneRight, sceneLeft];
+    for (let i = 0; i &lt; sceneArr.length; i++) {
+      const item = sceneArr[i];
+      var ftLayerPolygon = new tjh.ar.FeatureLayer(ele.url[0], &quot;&quot;, false, item.terrainLayers, item.globalOffset);
+      ftLayerPolygon.loadAllOnce = true;
+      // polygon
+      ftLayerPolygon.regulator.isLoadFeature = true;// 是否加载矢量streetSurface
+      ftLayerPolygon.regulator.requestNum = 10;// 每帧加载数量
+      ftLayerPolygon.regulator.color.set(Number(ele.setColor[0]));// 矢量颜色
+      ftLayerPolygon.regulator.opacity = (ele.type === &quot;community&quot;) ? 0.5 : 1;// 矢量透明度
+      ftLayerPolygon.regulator.size = 3.0;
+      // 矢量贴合方式--人工指定高层
+      ftLayerPolygon.regulator.fitPattern = tjh.ar.FeatureLayer.FIT_PATTERN.FIT_TERRIAN_LOW;
+      ftLayerPolygon.initMaterial();
+      item.addFeatureLayer(ftLayerPolygon); //向其中添加边界线
+
+      isRenderLabel = true; //触发封装库中的添加方法
+
+      let textConfig = [
+        { type: &quot;street&quot;, target: streetShape, target2: streetShapeRight },
+        { type: &quot;community&quot;, target: communityShape, target2: communityShapeRight },
+        { type: &quot;jurisdiction&quot;, target: jurisdictionShape, target2: jurisdictionShapeRight }
+      ];
+      textConfig.forEach(element =&gt; {
+        if (ele.type === element.type) {
+          let { target, target2 } = element;
+          for (let num = 0; num &lt; ele.centerPosition.length; num++) {
+            const { name, x, y } = ele.centerPosition[num];
+            target.addLabel(null, name, new THREE.Vector3(x, y, 50));
+            target2.addLabel(null, name, new THREE.Vector3(x, y, 50));
+          }
+        }
+      });
+    }
+  });
+
+</code></pre>
+<h3 id="vue数据响应式更新">Vue数据响应式更新</h3>
+<p>由于 Vue 是在初始化实例时，将实例属性执行<code>getter/settter</code>对于已经创建的<code>vue</code>实例不允许动态添加跟级别的相应式属性。因为这样不会触发变化的监控，所以视图的更新无法自动刷新；</p>
+<blockquote>
+<p>使用 <code>Vue.set</code> 或者 <code>vm.$set</code>运行时候进行动态添加；</p>
+</blockquote>
+<pre><code class="language-javascript">vm.$set(object,propertyName,value);// 适用于后端数据返回后处理成自己需要的属性集合
+//eg: 向每个item添加自定义属性
+this.posts =  res.map( item =&gt; {
+    return { ...item, //somepropertyName }
+})
+</code></pre>
+<blockquote>
+<p>根节点数据初始化的时候全部添加</p>
+</blockquote>
+<pre><code class="language-javascript">data() {  // 当变量很多的时候，考虑分组后合并，避免混乱
+  const userInfo = { //....
+  };
+  const config = { //....
+  };
+  return { ...userInfo, ...config, }
+}
+</code></pre>
+<h1 id="文件上传">文件上传</h1>
+<blockquote>
+<p>在使用过程中涉及到 Post 请求用于上传文件，，使用 <code>FormData</code> 进行文件上传；</p>
+</blockquote>
+<pre><code class="language-html">&lt;!-- type=file 代表上传文件  --&gt;
+&lt;!-- accept='' 代表上传文件限制，这里 .xls, .xlsx 代表限定为 excel类型 --&gt;
+&lt;input type=&quot;file&quot; name=&quot;&quot;  id=&quot;&quot; accept=&quot;.xls, .xlsx&quot; &gt;
+</code></pre>
+<p><code>FormData</code> 对象用以将数据编译成键值对，以便用 <code>XMLHttpRequest</code> 来发送数据，其中如果表单 <code>enctype</code> 属性设为 <code>multipart/form-data</code> ，则会使用表单的 <code>submit()</code> 方法来发送数据；</p>
+<pre><code class="language-javascript">var formData = new FormData();
+
+formData.append(&quot;name&quot;, &quot;tom&quot;);
+formData.append(&quot;num&quot;, 123); //数字123会被立即转换成字符串 &quot;123&quot;
+
+
+// 在jq使用 - 设置不处理数据及内容类型即可
+var formData = new FormData(document.querySelector(&quot;form&quot;));
+formData.append(&quot;file&quot;, fileInputElement.files[0]);
+$.ajax({
+  url: &quot;stash.php&quot;,
+  type: &quot;POST&quot;,
+  data: formData,
+  processData: false,  // 不处理数据
+  contentType: false   // 不设置内容类型
+  success(res){},
+});
+
+</code></pre>
+<p>在 vue 模板配合 axios 使用如下：</p>
+<pre><code class="language-html">&lt;template&gt;
+  &lt;div id=&quot;app&quot;&gt;
+    &lt;input id=&quot;fileinput&quot; @change=&quot;uploading($event)&quot; type=&quot;file&quot; accept=&quot;image/*&quot;&gt;
+    &lt;button @click.prevent=&quot;submit()&quot;&gt;&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  name: &quot;#app&quot;,
+  data() {
+    return { file: &quot;&quot;, src: &quot;&quot; };
+  },
+  methods: {
+    uploading(event) {
+      this.file = event.target.files[0]; //获取文件
+      var windowURL = window.URL || window.webkitURL;
+      this.file = event.target.files[0];
+      this.src = windowURL.createObjectURL(event.target.files[0]);//创建图片文件的url
+    },
+
+    submit() {
+      let formdata = new FormData();
+      formdata.append(&quot;file&quot;, this.file);
+      let config = {//此处必须设置为  multipart/form-data
+        headers: {
+          &quot;Content-Type&quot;: &quot;multipart/form-data&quot; //之前说的以表单传数据的格式来传递fromdata
+        }
+      };
+
+      this.$http.post(&quot;/upload&quot;, formData, config)
+        .then(res =&gt; {
+          //do something
+        })
+        .catch(error =&gt; {});
+    }
+  }
+};
+&lt;/script&gt;
+</code></pre>
+<h1 id="iframe页面数据访问">iframe页面数据访问</h1>
+<blockquote>
+<p>由于三维地图浏览功能和其他大部分逻辑无关，所以放置在一个新的 iframe 中进行业务逻辑编写； 但是数据获取传入以及调用，需要调用方法和给变量赋值；</p>
+</blockquote>
+<pre><code class="language-html">&lt;!-- parent.html --&gt;
+&lt;div class='iframeContainer'&gt;
+  &lt;iframe src='' id='myIframe'&gt;
+&lt;/div&gt;
+</code></pre>
+<pre><code class="language-javascript">//iframe.js
+var testValue;  // 因为我们从主页面获取的是 window 对象，所以我们使用 var 声明变量，以便于直接进行获取；
+
+function subFunction(){
+  //do something
+}
+
+
+// parent.js
+let childWindow = document.querySelector('#myIframe').contentWindows; //获取到子页面的 window 对象
+childWindow.testValue = 'changed' ; //修改
+childWindow.subFunction(); //执行子页面的方法
+
+
+// 对于子页面访问父页面则是可以通过`parent`即可访问到；
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[项目总结 -- webAr建筑管理系统]]></title>
+        <id>https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong</id>
+        <link href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong">
+        </link>
+        <updated>2019-01-23T01:31:27.000Z</updated>
+        <summary type="html"><![CDATA[<blockquote>
+<p>其实这里有点标题党的嫌疑，其实这个项目在一月初的时间已经完成了，因为是 <code>webAr</code> 项目的初始应用（没有使用打包工具和 cli ），加上业务逻辑很复杂，所以这里实际上是基于 <code>Vue-li</code>下对于项目的总结</p>
+</blockquote>
+]]></summary>
+        <content type="html"><![CDATA[<blockquote>
+<p>其实这里有点标题党的嫌疑，其实这个项目在一月初的时间已经完成了，因为是 <code>webAr</code> 项目的初始应用（没有使用打包工具和 cli ），加上业务逻辑很复杂，所以这里实际上是基于 <code>Vue-li</code>下对于项目的总结</p>
+</blockquote>
+<!-- more --> 
+<h3 id="错误-class-constructor-funname-cannot-be-invoked-without-new">错误 : <code>Class constructor FunName cannot be invoked without 'new'</code></h3>
+<ul>
+<li><strong>起由</strong>：直接调用的父类的时候无法使用子类继承，只能通过 <code>new</code> 的方式，即: 无法使用已转换的类扩展本机类</li>
+<li><strong>方法</strong>：修改<code>.babelrc</code> - 排除 <code>transform-es2015-classes</code></li>
+</ul>
+<pre><code class="language-javascript">// &lt;!-- 参考：https://stackoverflow.com/questions/36577683/babel-error-class-constructor-foo-cannot-be-invoked-without-new --&gt;
+presets: [
+    [&quot;env&quot;, {
+        exclude: [&quot;transform-es2015-classes&quot;]
+    }]
+]
+</code></pre>
+<h3 id="功能-添加-css2dlabel-进行场景的特殊标注">功能 : 添加 <code>css2DLabel</code> 进行场景的特殊标注</h3>
+<ul>
+<li><strong>起由</strong>: 添加 <code>css2D</code> 层 <code>canvas</code> 无法使用定义好的事件；</li>
+<li><strong>方法</strong>：修改 <code>css2D</code> 的 <code>z-index</code> ，并需要传递已定义的事件</li>
+</ul>
+<pre><code class="language-javascript">is_render = true;
+
+//初始化css2DRender &amp;&amp; Dom style
+let css2DRender = new THREE.CSS2DRenderer(viewer);
+initCSS2DRender(css2DRenderer);
+
+// 赋值事件，添加Dom
+css2DRender.domElement.ondbclick = () =&gt; {
+    terrain.methods.dbFinishToolEvents
+};
+css2DRender.domElement.onclick = () =&gt; {
+    terrain.methods.FinishToolEvents
+};
+document.getElementById(&quot;container&quot;).appendChild(css2DRenderer.domElement);
+
+// 场景更新
+viewer.onEndRenderTechnique = () =&gt; {
+    if (is_render) {
+        css2DRenderer.render(scene, camera)
+    }
+}
+</code></pre>
+<h3 id="关于-css2dlabellayer-的-addlabel-方法的改写">关于 <code>css2DLabelLayer</code> 的 <code>addLabel</code> 方法的改写:</h3>
+<blockquote>
+<p>通过 imgconfig 参数配置的传递生成 ImgIcon 部分</p>
+</blockquote>
+<pre><code class="language-javascript">// dom 添加 imgIcon
+labelDiv.appendChild(getCSS2DIcon(imgconfig));
+
+/**
+ * 生成 ImgIcon
+ * @param {Object} config - 用于生成 ImgIcon 的配置
+ * @returns Image Dom
+ */
+function getCSS2DIcon(config) {
+  let CSS2D_IMGCONFIG;
+  config ? CSS2D_IMGCONFIG = config : CSS2D_IMGCONFIG = {
+    src: '/static/img/position.gif',
+    width: &quot;30px&quot;,
+    height: &quot;40px&quot;,
+    position: &quot;absolute&quot;,
+    top: &quot;24px&quot;,
+    left: &quot;32%&quot;
+  };
+
+  let imgIcon = new Image();
+  imgIcon.src = CSS2D_IMGCONFIG.src;
+  Object.assign(imgIcon.style, CSS2D_IMGCONFIG);
+
+  return imgIcon;
+}
+</code></pre>
+<pre><code class="language-javascript">//在创建css2DLayer的时：利用 dom 生成 cssLabel
+let cssLabel = new THREE.CSS2DObject(labelDiv);
+cssLabel.heightRatio = 5; // 设定 heightRatio (4-使用gif中心为旋转的点)
+this.add(cssLabel);  //此处的this是 CSS2DLabelLayer 类
+</code></pre>
+<h3 id="功能在对canvas上进行事件监听的用于满足逻辑通常是工具类的自动关闭">功能：在对canvas上进行事件监听的用于满足逻辑（通常是工具类的自动关闭）</h3>
+<pre><code class="language-javascript">//Html Dom
+// &lt;canvas id=&quot;canvasView&quot; @click=&quot;finishToolsEvent&quot; @dblclick=&quot;dbFinishToolsEvent&quot;&gt;&lt;/canvas&gt;
+
+//JS methods
+finishToolsEvent(timeout = 300){
+  if(this.clickTimer){
+      window.clearTimeout(this.clickTimer)；
+      this.clickTimer = null;
+  }
+
+  this.clickTimer = window.setTimeOut(() =&gt; {
+    // do something single click
+  },timeout)
+}，
+dbFinishToolsEvent(){
+	if (this.clickTimer) {
+    window.clearTimeout(this.clickTimer);
+      this.clickTimer = null;
+  }
+  //do something dbclick
+}
+</code></pre>
+<h3 id="功能-对于一些加载时间比较久的组件不希望功能切换的时候状态丢失">功能 : 对于一些加载时间比较久的组件，不希望功能切换的时候状态丢失；</h3>
+<ul>
+<li><strong>方法</strong>：使用<code>vue-router</code>的 <code>keep-alive</code> 保持加载完成的状态；</li>
+</ul>
+<pre><code class="language-java">//vue component
+&lt;keep-alive&gt;
+     &lt;router-view v-if='$router.meta.keep_alive'&gt;&lt;/router-view&gt;
+&lt;/keep-alive&gt;
+&lt;router-view v-if='!$router.meta.keep_alive'&gt;&lt;/router-view&gt;
+</code></pre>
+<pre><code class="language-javascript">// router/index.js
+export default new Router({
+    route: [{
+        // ....   
+        children: [{
+            path: './SatelliteImgContrast',
+            component: resolve =&gt; require(['@components/satelliteImgContrast'], resolve),
+            meta: {
+                title: 'xx',
+                keep_alive: true
+            }
+        }]
+    }]
+})
+</code></pre>
+<h3 id="基于-vuex-的数据管理">基于 Vuex 的数据管理</h3>
+<p>由于迁移了较多的功能，整个项目数据状态较多，使用了<code>Vuex</code>进行数据管理；</p>
+<p><code>store</code> 在 <code>Vue-cli</code>的组织结构如下</p>
+<pre><code>├── index.html
+├── main.js
+├── components
+└── store
+    ├── index.js          #  组装模块并导出 store
+    ├── state.js          #  state (存储状态)
+    ├── getters.js        #  getter (派生状态)
+    ├── mutation-types.js #  constant (状态修改类型)
+    ├── mutations.js      #  mutation (提交状态修改)
+    ├── actions.js        #  action (异步操作 - 提交mutation)
+</code></pre>
+<p>可以提及一下的是：</p>
+<ul>
+<li><code>mutation-type.js</code> 是单独存放 <code>mutation</code> 的类型存在的，和 <code>mutation</code> 配合使用的</li>
+</ul>
+<p>Example：</p>
+<pre><code class="language-javascript">// mutation-type.js
+export const SET_ALLLAYER_DATA = &quot;SET_ALLLAYER_DATA&quot;;
+export const DEL_DREWLAYER_DATA = &quot;DEL_DREWLAYER_DATA&quot;;
+
+// mutation.js
+import * as types from './mutation-type.js';
+
+export default {
+    [types.SET_ALLLAYER_DATA](state, {name, data}) {
+        state.layerData[name] = data;
+    },
+    [types.DEL_DREWLAYER_DATA](state, uuid) {
+        state.layerData.forEach((ele, i, arr) =&gt; {
+            if (ele.uuid === uuid) arr.splice(index, 1)
+        })
+    }
+}
+
+</code></pre>
+<ul>
+<li><code>action</code> 提供异步操作，并提交 <code>mutation</code></li>
+</ul>
+<p><code>action</code> 第一个参数默认是和 <code>store</code> 具有相同参数属性的对象。实际上 <code>action</code> 不具有修改 <code>state</code> 的能力，依旧通过提交（触发）<code>mutation</code> 实现修改；</p>
+<pre><code class="language-javascript">// store.dispatch(actionType)
+// action.js
+import * as types from './mutation-type.js';
+
+export default {
+  actionExample({ commit }, { uuid, name, data }) {
+    commit(types.DEL_DREWLAYER_DATA, uuid);
+    commit({ type: types.SET_ALLLAYER_DATA, name, data });
+  }
+};
+</code></pre>
+<ul>
+<li>辅助函数 <code>mapState/mapGetters/mapMutations/mapActions</code></li>
+</ul>
+<p>当需要在组件中引用的方法或者属性较多的时候我们使用辅助函数帮助我们实现, 对象展开运算符把我们需要的属性和方法映射到到对应的父级（vue属性）；</p>
+<pre><code class="language-javascript">// 几种不同的方式
+import {mapGetters, mapMutations, mapActions} from 'vuex';
+export default {
+    computed: {
+        ...mapGetters(['getLayerData','getDrawLayerData']),//名称与 state 的子节点名称相同时
+        ...mapState({
+          excavateData: state =&gt; state.excavate.data
+        })
+    },
+    methods: {
+        ...mapMutations({
+            setData: 'SET_ALLLAYER_DATA',//另取一个名字，使用对象形式
+            deleteDrawData: 'DEL_DREWLAYER_DATA'
+        }),
+        ...mapActions([ actionExample ])
+    }
+};
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[项目总结 -- 智慧桥梁]]></title>
+        <id>https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang</id>
+        <link href="https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang">
+        </link>
+        <updated>2018-03-14T01:59:31.000Z</updated>
+        <summary type="html"><![CDATA[<blockquote>
+<p>项目中总结出一些常见问题，顺便熟悉开发中出现的<code>API</code>；</p>
+</blockquote>
+]]></summary>
+        <content type="html"><![CDATA[<blockquote>
+<p>项目中总结出一些常见问题，顺便熟悉开发中出现的<code>API</code>；</p>
+</blockquote>
+<!-- more --> 
+<p>smartBridge's  tips：</p>
+<h2 id="操作iframe后点击模型后出现的闪烁问题">操作iframe后点击模型后出现的闪烁问题</h2>
+<blockquote>
+<p>解决方法： 改变焦点事件</p>
+</blockquote>
+<ol>
+<li>
+<p>在模型队形的html上加入 <code>onmouseover=&quot;changeFocus()&quot;</code>；</p>
+</li>
+<li>
+<p>js中定义并执行一个无意义的点击操作</p>
+<pre><code class="language-javascript"> function changeFocus() {
+    $('.test').click();
+ }
+</code></pre>
+</li>
+</ol>
+<!-- more -->
+<h2 id="视图中定位方法的实现">视图中定位方法的实现</h2>
+<blockquote>
+<p>需要定位到的位置坐标(x,y,z)</p>
+</blockquote>
+<pre><code class="language-javascript">function position(x, y, z) {
+    var vec3 = VirtualRealityCtrl.UtilManager.CreateInstance(&quot;Vertex&quot;);//创建病害坐标;
+    vec3.X = x;
+    vec3.Y = y;
+    vec3.Z = z;
+    var normalview = VirtualRealityCtrl.ViewerManager.GetView(0);  //拿到标准视图对象
+    normalview.SetPosition(vec3, 80, 1);//以标准视图的视角定位到视图的中心点（坐标，高度，过渡时间）
+}
+</code></pre>
+<h2 id="植入模型后无法释放工具反复添加">植入模型后无法释放工具，反复添加</h2>
+<blockquote>
+<p>给定一个标识状态（目前不知道为什么加了就可以了）</p>
+</blockquote>
+<pre><code class="language-javascript">var flagModel = false;   //给定一个状态
+
+{ 
+  //模型添加触发事件
+  flagModel = true;
+  //获取到模型的url = ？？
+  VirtualRealityCtrl.ToolManager.ActiveTool = 5;    //切换为点击事件
+  VirtualRealityCtrl.attachEvent(&quot;ToolEvent&quot;, ToolEventAddModel); //ar注册事件
+}
+
+function ToolEventAddModel(id, type, data) {
+    var obj = JSON.parse(data);
+    if (flagModel) {
+        AR.Tool.AddModel(url, obj[1]); //obj[1]是坐标信息集合
+        flagModel = false;
+    }
+    if (obj.ID != &quot;&quot;) {
+        VirtualRealityCtrl.ToolManager.ReleaseActiveTool(); //释放点击的状态
+    }
+}
+</code></pre>
+<h2 id="视图中添加模型非种植的一些操作">视图中添加&quot;模型&quot;（非种植的）一些操作</h2>
+<blockquote>
+<p>这里用智慧桥梁中的病害信息为例</p>
+</blockquote>
+<ul>
+<li>创建</li>
+</ul>
+<blockquote>
+<p>实际上病害的创建是创建文本模型</p>
+</blockquote>
+<pre><code class="language-javascript">var txt = VirtualRealityCtrl.ModelManager.CreateTextModelParam();
+var vec3 = VirtualRealityCtrl.UtilManager.CreateInstance(&quot;Vertex&quot;);
+vec3.X = x;
+vec3.Y = y;
+vec3.Z = z;
+txt.Position = vec3;
+txt.Text = t;
+txt.ImagePath = basePath + imgUrl;
+var mod = VirtualRealityCtrl.ModelManager.CreateTextModel(txt); //创建传感器说明
+mod.ShowDirScreen = true;                                       //是否显示说明文字
+VirtualRealityCtrl.LayerManager.ModelLayer.AddNode(mod);        //添加到展示层
+arr.push({
+    KeyId: item[i].KeyId,         //keyID是用于非文本模型操作的标识（依据此的请求等）
+    ModId: mod.ID                 //mod.ID是获取该文本模型的标识
+});
+</code></pre>
+<ul>
+<li>删除</li>
+</ul>
+<blockquote>
+<p>依赖于创建时三维视图中的唯一标识ID</p>
+</blockquote>
+<pre><code class="language-javascript">if (arr != null) {
+    for (var i = 0; i &lt; arr.length; i++) {
+        var model = VirtualRealityCtrl.LayerManager.GetModelNodeByID(arr[i].ModId);
+        if (model != null) {
+            VirtualRealityCtrl.LayerManager.ModelLayer.DeleteNode(model);
+        }
+    }
+    arr = [];
+}
+</code></pre>
+<ul>
+<li>依据自定义<code>iD</code>字段请求</li>
+</ul>
+<blockquote>
+<p>在注册事件中进行判断当前操作的文本模型是哪一个<code>mod.id</code>？？ 然后通过这个再拿到<code>keyId</code>发起网络请求</p>
+</blockquote>
+<pre><code class="language-javascript">VirtualRealityCtrl.attachEvent(&quot;ToolEvent&quot;, ToolEvents); //AR中的注册事件
+
+function ToolEvents(id, type, data) {
+  	var obj = JSON.parse(data); 
+  	if (type == &quot;5&quot;) {
+      	//其他操作
+		$.ajax({
+          type: &quot;GET&quot;,
+          url: &quot;../data/JsonData/timeMachine.json&quot;,
+          success: function (data) {
+            //其他操作
+          }
+  	}
+}
+</code></pre>
+<h2 id="绘制挡板面">绘制挡板（面）</h2>
+<blockquote>
+<p>思路：通过将工具<code>type=4</code>，调出绘面工具，然后在注册事件中拿到对应的点的坐标</p>
+</blockquote>
+<ul>
+<li>拼接新的数组</li>
+</ul>
+<pre><code class="language-javascript">function ToolEvents(id, type, data) { 
+  var obj = JSON.parse(data);//data为数组坐标合集
+      if (type == &quot;4&quot;) {
+          for (var i = 0; i &lt; obj.length; i++) {
+              var tem = []
+              if (i &lt; obj.length - 1) {
+                  tem = [obj[i], obj[i + 1]]
+              } else {
+                  tem = [obj[i], obj[0]]
+              }
+              bottomPoint.push(tem)
+          }
+          VirtualRealityCtrl.ToolManager.ActiveTool = 0;
+          drawFace();
+   }
+}
+</code></pre>
+<pre><code class="language-javascript">//当时出现的问题在于：创建的时候把pgParam、vec3放在了循环外面
+function drawFace() {
+  for (var i = 0; i &lt; bottomPoint.length; i++) {
+      var pgParam = VirtualRealityCtrl.ModelManager.CreatePolygonModelParam(); //创建线面
+      var vec3 = VirtualRealityCtrl.UtilManager.CreateInstance(&quot;Vertex&quot;);
+      for (var j = 0; j &lt; bottomPoint[i].length; j++) {
+          vec3.X = bottomPoint[i][j].X;
+          vec3.Y = bottomPoint[i][j].Y;
+          vec3.Z = bottomPoint[i][j].Z;
+          pgParam.AddVertex(vec3);
+      }
+      var temArr = bottomPoint[i].reverse();
+      for (var k = 0; k &lt; temArr.length; k++) { //坐标变换
+          vec3.X = temArr[k].X;
+          vec3.Y = temArr[k].Y;
+          vec3.Z = temArr[k].Z + 5;
+          pgParam.AddVertex(vec3);
+      }
+      pgParam.FillColor = 03333;      //添加其他属性
+      pgParam.ShowSide = true;
+      pgParam.SideColor = 03333;
+      pgParam.SideWidth = 2;
+      var plmodel = VirtualRealityCtrl.ModelManager.CreatePolygonModel(pgParam);
+      plmodel.Transparency = 0.5;
+      VirtualRealityCtrl.LayerManager.ModelLayer.AddNode(plmodel);//添加到场景中
+      temArr = []; //清空临时数组
+  }
+  bottomPoint = [];
+}
+</code></pre>
+<h2 id="vue-复选框的使用">vue 复选框的使用</h2>
+<ul>
+<li>
+<p>单个复选框用于绑定布尔值</p>
+<pre><code class="language-java">&lt;input type=&quot;checkbox&quot; id=&quot;&quot;  v-model=&quot;checked&quot;&gt;  &lt;!-- checked = &quot;true&quot; or &quot;false&quot; --&gt;
+</code></pre>
+</li>
+<li>
+<p>多个复选框用于绑定数组（传入value值入数组）</p>
+<pre><code class="language-Java">&lt;input type=&quot;checkbox&quot; id=&quot;a&quot; value=&quot;John&quot; v-model=&quot;checkedNames&quot;&gt;
+&lt;label for=&quot;a&quot;&gt;John&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; id=&quot;b&quot; value=&quot;Mike&quot; v-model=&quot;checkedNames&quot;&gt;
+&lt;label for=&quot;b&quot;&gt;Mike&lt;/label&gt;
+&lt;!-- checkedNames为选中复选框的input对应value值的集合 --&gt;
+</code></pre>
+</li>
+</ul>
+<h2 id="ie11-下注册事件的兼容设置">IE11 下注册事件的兼容设置</h2>
+<blockquote>
+<p>Internet Explorer 11 默认情况下不支持 attachEvent 注册事件，需要在页面中修改默认兼容设置为IE10 才能使用 attachEvent 注册事件。 head中添加：</p>
+</blockquote>
+<pre><code class="language-java"> &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=10&quot; /&gt;
+</code></pre>
+]]></content>
+    </entry>
+</feed>
