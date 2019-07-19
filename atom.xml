@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://toxicfy.github.io/</id>
     <title>Fy的个人小站</title>
-    <updated>2019-07-04T06:06:42.823Z</updated>
+    <updated>2019-07-19T09:59:23.808Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://toxicfy.github.io/"/>
     <link rel="self" href="https://toxicfy.github.io//atom.xml"/>
@@ -10,6 +10,116 @@
     <logo>https://toxicfy.github.io//images/avatar.png</logo>
     <icon>https://toxicfy.github.io//favicon.ico</icon>
     <rights>All rights reserved 2019, Fy的个人小站</rights>
+    <entry>
+        <title type="html"><![CDATA[基于 Vue 全家桶 + Koa2 + MongoDB 实现登录注册]]></title>
+        <id>https://toxicfy.github.io//post/vue-koa2-login-regisiter</id>
+        <link href="https://toxicfy.github.io//post/vue-koa2-login-regisiter">
+        </link>
+        <updated>2019-07-19T06:05:40.000Z</updated>
+        <summary type="html"><![CDATA[<p>因为公司的服务端是 <code>C#</code>, 之前快速开发的应用使用前后端耦合开发；由于目前项目已经前后端分离开发，所以这里通过一个基于 <code>Vue</code> + <code>koa2</code> +<code>MongoDB</code>完成注册、登录功能并使用<code>token</code> 认证的方式进行权限控制，以便于了解前后端分离的数据交互</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>因为公司的服务端是 <code>C#</code>, 之前快速开发的应用使用前后端耦合开发；由于目前项目已经前后端分离开发，所以这里通过一个基于 <code>Vue</code> + <code>koa2</code> +<code>MongoDB</code>完成注册、登录功能并使用<code>token</code> 认证的方式进行权限控制，以便于了解前后端分离的数据交互</p>
+ <!-- more -->
+<h2 id="基本思路">基本思路</h2>
+<blockquote>
+<p>前端页面构建完成后，通过封装了拦截器的 <code>axios</code> 进行数据请求由 <code>koa2</code>提供的 <code>api</code> 接口。 注册完成后登录时，服务端进行数据校验后返回成功并携带 <code>token</code>，前端进行 <code>token</code> 的存储;</p>
+</blockquote>
+<blockquote>
+<p>除了静态数据以及登录注册，其他接口的访问均需要 <code>Header</code> 携带 <code>token</code>值，以便于服务端进行 <code>token</code> 校验后返回需要的数据, 进而完成数据交互</p>
+</blockquote>
+<p><img src="https://ae01.alicdn.com/kf/HTB14xWWaKP2gK0jSZFo761uIVXaK.png" alt=""></p>
+<h2 id="前端实现">前端实现</h2>
+<hr>
+<h3 id="路由控制拦截">路由控制/拦截</h3>
+<blockquote>
+<p>实现方式</p>
+</blockquote>
+<ol>
+<li>
+<p>定义 <code>router</code> 路由配置里面的 <code>meta</code> 字段确定该路由需要登录权限；</p>
+</li>
+<li>
+<p>通过 <code>vue-router</code> 提供的导航守卫完成我们需要的路由拦截 ，我们这里使用的是全局守卫的 <code>beforeEach</code>。</p>
+<p>PS :  <strong>导航守卫</strong>实际是对应的路由行为时触发时执行的钩子函数，我们可以通过 <code>next()</code> 方法阻止/改变此次路由行为；</p>
+</li>
+<li>
+<p>路由在完成跳转前都是处于 <strong>waiting</strong> （等待）的状态，而在一个守卫里： <code>next()</code> 方法的调用便是为了 <code>resolve</code> 当前的钩子，当全部钩子执行完成，此时路由变为 <strong>confirmed</strong> （确认）状态</p>
+</li>
+</ol>
+<pre><code class="language-javascript">import Vue from 'vue'
+import Router from 'vue-router'
+import Login from './views/user/Login'
+import Register from './views/user/Register'
+import Manage from './views/user/Manage'
+import store from './store'
+
+Vue.use(Router)
+
+// 定义routes 配置
+const routes = [
+  {
+    path: '/login',
+    name: 'login',
+    component: Login,
+    meta: {
+      title: '登录'
+    }
+  },
+  {
+    path: '/manage',
+    name: 'manage',
+    component: Manage,
+    meta: {
+      title: '管理',
+      requireAuth: true   //定义requireAuth字段确定该路由需要登录权限
+    }
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: Register,
+    meta: {
+      title: '注册'
+    }
+  }
+]
+
+const router = new Router({routes})
+
+//页面进行刷新后，重新赋值 store.user.token
+if (localStorage.getItem('token')) {
+  store.commit({
+    type: 'SET_TOKEN',
+    token: localStorage.getItem('token')
+  })
+}
+
+// 页面跳转权限控制
+router.beforeEach((to, from, next) =&gt; {
+   // 页面需要登录权限
+  if (to.meta.requireAuth) {
+    if (store.getters.token) {
+      next()
+    } else {
+      // token 无效，重定向到登录页
+      Vue.prototype.$message({
+        type: 'warning',
+        message: '认证过期，需要重新登录'
+      })
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    }
+  } else {
+    next()
+  }
+})
+
+export default router
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[项目维护 -- 历史违建处理模块]]></title>
         <id>https://toxicfy.github.io//post/historyIllegale</id>
