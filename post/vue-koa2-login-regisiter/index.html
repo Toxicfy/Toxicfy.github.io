@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1563530238907">
+<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1563786364444">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://toxicfy.github.io//styles/main.css">
 
@@ -36,7 +36,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://toxicfy.github.io/">
-        <img src="https://toxicfy.github.io//images/avatar.png?v=1563530238907" class="site-logo">
+        <img src="https://toxicfy.github.io//images/avatar.png?v=1563786364444" class="site-logo">
         <h1 class="site-title">Fy的个人小站</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -117,17 +117,18 @@
 <p><img src="https://ae01.alicdn.com/kf/HTB14xWWaKP2gK0jSZFo761uIVXaK.png" alt=""></p>
 <h2 id="前端实现">前端实现</h2>
 <hr>
+<p>关于页面的实现数据提交获取以及 <code>Vuex</code> 的使用比较简单，这里不进行介绍；前端部分主要记录路由部分的控制和 <code>axios</code> 拦截的实现</p>
 <h3 id="路由控制拦截">路由控制/拦截</h3>
 <blockquote>
 <p>实现方式</p>
 </blockquote>
 <ol>
 <li>
-<p>定义 <code>router</code> 路由配置里面的 <code>meta</code> 字段确定该路由需要登录权限；</p>
+<p>定义 <code>router</code> 路由配置里面的 <code>meta</code> 字段确定该路由需要<strong>登录权限</strong>；</p>
 </li>
 <li>
 <p>通过 <code>vue-router</code> 提供的导航守卫完成我们需要的路由拦截 ，我们这里使用的是全局守卫的 <code>beforeEach</code>。</p>
-<p>PS :  <strong>导航守卫</strong>实际是对应的路由行为时触发时执行的钩子函数，我们可以通过 <code>next()</code> 方法阻止/改变此次路由行为；</p>
+<p>PS : <strong>导航守卫</strong>实际是对应的路由行为时触发时执行的钩子函数，我们可以通过 <code>next()</code> 方法阻止/改变此次路由行为；</p>
 </li>
 <li>
 <p>路由在完成跳转前都是处于 <strong>waiting</strong> （等待）的状态，而在一个守卫里： <code>next()</code> 方法的调用便是为了 <code>resolve</code> 当前的钩子，当全部钩子执行完成，此时路由变为 <strong>confirmed</strong> （确认）状态</p>
@@ -158,7 +159,7 @@ const routes = [
     component: Manage,
     meta: {
       title: '管理',
-      requireAuth: true   //定义requireAuth字段确定该路由需要登录权限
+      requireAuth: true //定义requireAuth字段确定该路由需要登录权限
     }
   },
   {
@@ -171,7 +172,7 @@ const routes = [
   }
 ]
 
-const router = new Router({routes})
+const router = new Router({ routes })
 
 //页面进行刷新后，重新赋值 store.user.token
 if (localStorage.getItem('token')) {
@@ -183,7 +184,7 @@ if (localStorage.getItem('token')) {
 
 // 页面跳转权限控制
 router.beforeEach((to, from, next) =&gt; {
-   // 页面需要登录权限
+  // 页面需要登录权限
   if (to.meta.requireAuth) {
     if (store.getters.token) {
       next()
@@ -204,6 +205,184 @@ router.beforeEach((to, from, next) =&gt; {
 })
 
 export default router
+</code></pre>
+<h2 id="axios-封装">Axios 封装</h2>
+<blockquote>
+<p>实现方式</p>
+</blockquote>
+<ul>
+<li>使用 <code>axios</code> 的拦截器，统一处理所有<code>http</code>请求和响应；</li>
+<li>在需要权限的部分，发起请求时候给 <code>Header</code> 添加 <code>token</code>，处理返回的信息时候，当返回 <code>401</code>未授权时候，信息清除并进行跳转</li>
+</ul>
+<pre><code class="language-javascript">import axios from 'axios'
+import store from './store'
+import * as type from './store/constant'
+import router from './router'
+
+axios.defaults.baseURL = 'http://localhost:3000/api/'
+axios.defaults.headers['Content-Type'] = 'application/json'
+
+// 添加请求拦截器
+axios.interceptors.request.use(
+  config =&gt; {
+    // 如果存在token的话，则每个http header都加上
+    if (localStorage.getItem('token')) {
+      config.headers.Authorization = `Bearer ${store.getters.token}`
+    }
+    return config
+  },
+  err =&gt; {
+    return Promise.reject(err)
+  }
+)
+
+axios.interceptors.response.use(
+  //在后端不直接抛出异常，而是返回对应的状态码，这样我们依旧在response部分进行处理
+  response =&gt; {
+    if (response.data &amp;&amp; response.data.status) {
+      switch (response.data.status) {
+        case 401:
+          store.commit(type.REMOVE_TOKEN)
+          const currentRouter = router.currentRoute.path
+          currentRouter !== 'login' &amp;&amp;
+            router.push({
+              path: 'login'
+            })
+          break
+
+        default:
+          break
+      }
+    }
+    return response
+  },
+  err =&gt; {
+    return new Promise.reject(err.response.data)
+  }
+)
+
+export default axios
+</code></pre>
+<h2 id="后端部分">后端部分</h2>
+<p>后端部分实际上同样并不复杂，关于 <code>mongoose</code>的<code>model</code>的定义以及 <code>koa2</code> 与其的交互也是不打算挪列，主要描述 <code>Token</code> 的生成验证以及对应<code>koa2</code>的配合；</p>
+<h3 id="jwt-认证">JWT 认证</h3>
+<blockquote>
+<p>实现方式</p>
+</blockquote>
+<ol>
+<li>客户端登录页输入用户名密码，发送请求给后端 (使用的是明文，这个时候 <code>https</code> 就很重要了，sad~)</li>
+<li>客户端 <code>koa2</code> 获取并解析到内容，密码使用 <code>bcrypt</code> 进行校验；如果符合，就下发一个 <code>token</code> 返回给客户端。否则返回验证错误信息。</li>
+<li>登录成功后，客户端将<code>token</code>用使用<code>localStorage</code>,并赋值给<code>vuex</code>进行存储，之后要请求其他资源的时候，在请求头里带上这个<code>token</code>进行请求。</li>
+<li>后端收到请求信息，先验证一下<code>token</code>是否有效，有效则下发请求的资源否则返回<code>401</code></li>
+</ol>
+<ul>
+<li>使用<code>jsonwebtoken</code>完成<code>token</code>的创建以及编写验证<code>token</code>的中间件</li>
+</ul>
+<pre><code class="language-javascript">// createToken.js
+const jwt = require('jsonwebtoken')
+const { PRIVATE_KEY } = require('./key')
+
+module.exports = id =&gt; {
+  // jwt签发token，主体信息和秘钥是必须的
+  const token = jwt.sign(
+    {
+      id,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60
+    },
+    PRIVATE_KEY
+  )
+  return token
+}
+
+// validateToken.js
+const jwt = require('jsonwebtoken')
+const { PRIVATE_KEY } = require('./key')
+const User = require('../dbs/userModels').Users
+
+module.exports = async (ctx, next) =&gt; {
+  const authorization = ctx.get('Authorization')
+  if (!authorization) {
+    ctx.throw(401)
+  }
+  // jwt 验证
+  jwt.verify(
+    authorization.split(' ').pop(), // header Auth为空格分割的字符串
+    PRIVATE_KEY,
+    async (err, decoded) =&gt; {
+      if (err) {
+        ctx.throw(401) //有一个全局的错误处理中间件，处理后再发给前端
+      } else {
+        // 利用ctx作为数据传递，为了后续的koa2 中间件获取到_id
+        ctx.id = decoded.id
+      }
+    }
+  )
+  await next()
+}
+</code></pre>
+<ul>
+<li><code>koa2</code> 提供用户的注册和登录逻辑<code>API</code>，如果需要使用<code>jwt</code>的验证，只需要在处理函数之前使用<code>validateToken</code>中间件进行处理即可</li>
+</ul>
+<pre><code class="language-javascript">const Router = require('koa-router')
+const User = require('../dbs/userModels').Users
+const createToken = require('../token/createToken')
+const validateToken = require('../token/validateToken')
+const router = new Router()
+
+// 用户注册逻辑
+router.post('/api/register', async ctx =&gt; {
+  const { username, password } = ctx.request.body
+  const isRegister = await User.find({ username })
+  if (isRegister.length &gt; 0) {
+    ctx.body = {
+      code: -1,
+      message: '该用户名已被注册'
+    }
+    return
+  }
+  const user = await User.create({
+    username,
+    password
+  })
+  if (user) {
+    ctx.body = {
+      message: '用户注册成功',
+      code: 0
+    }
+  } else {
+    ctx.body = {
+      message: '用户注册失败，请重试',
+      code: -1
+    }
+  }
+})
+
+// 用户登录逻辑
+router.post('/api/login', async ctx =&gt; {
+  const { username, password } = ctx.request.body
+  // 验证用户是否存在
+  const user = await User.findOne({ username })
+  if (!user) {
+    return (ctx.body = {
+      message: '用户名不存在',
+      code: -1
+    })
+  }
+  // 验证密码 &amp;&amp; 生成token并下发
+  const isPasswordValid = require('bcrypt').compareSync(password, user.password)
+  if (isPasswordValid) {
+    const token = createToken(user._id)
+    ctx.body = {
+      token: token,
+      message: '登录成功',
+      code: 0
+    }
+  }
+})
+
+module.exports = {
+  router
+}
 </code></pre>
 
             </div>
