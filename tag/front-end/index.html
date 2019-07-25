@@ -1,194 +1,318 @@
-<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" >
-
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
 <title>前端 | Fy的个人小站</title>
-<meta name="description" content="斯人若彩虹,遇上方知有">
+<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1564070716783">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link rel="stylesheet" href="https://toxicfy.github.io//styles/main.css" type='text/css' media='all'>
 
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1563786364444">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
-<link rel="stylesheet" href="https://toxicfy.github.io//styles/main.css">
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
 
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 
 
 
-  </head>
-  <body>
-    <div id="app" class="main">
+</head>
+<body class="home blog ct-body standard">
+<div id="overflow-container" class="overflow-container">
+    <header id="site-header" class="site-header" role="banner">
+    <div class='top-navigation top-navigation-important'>
+        <div class='container'>
+            <div id="menu-secondary" class="menu-container menu-secondary" role="navigation">
+                <button id="toggle-secondary-navigation" class="toggle-secondary-navigation"><i class="fa fa-plus"></i></button>
+                <div class="menu">
+                    <ul id="menu-secondary-items" class="menu-secondary-items">
+                        
+                        
+                            
+                        <li id="menu-item" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item">
+                            <a href="https://toxicfy.github.io//tag/front-end">前端</a>
+                        </li>
+                            
+                        
+                            
+                        <li id="menu-item" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item">
+                            <a href="https://toxicfy.github.io//tag/project-summary">项目总结</a>
+                        </li>
+                            
+                        
+                    </ul>
+                </div>
+            </div>
+            <ul class="social-media-icons">
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </div>
+    </div>
 
-      <div class="sidebar" :class="{ 'full-height': menuVisible }">
-  <div class="top-container" data-aos="fade-right">
-    <div class="top-header-container">
-      <a class="site-title-container" href="https://toxicfy.github.io/">
-        <img src="https://toxicfy.github.io//images/avatar.png?v=1563786364444" class="site-logo">
-        <h1 class="site-title">Fy的个人小站</h1>
+    <div class="container">
+        <div id="title-info" class="title-info">
+            <div id='site-title' class='site-title'>
+                <a href="https://toxicfy.github.io/">  Fy的个人小站 </a>
+            </div>
+        </div>
+        <button id="toggle-navigation" class="toggle-navigation">
+            <i class="fa fa-bars"></i>
+        </button>
+        <div id="menu-primary-tracks" class="menu-primary-tracks"></div>
+        <div id="menu-primary" class="menu-container menu-primary" role="navigation">
+            <p class="site-description">斯人若彩虹,遇上方知有</p>
+            <div class="menu">
+                <ul id="menu-primary-items" class="menu-primary-items">
+                     
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/">首页</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/archives">归档</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/tags">标签</a>
+                            </li>
+                        
+                    
+                        
+                            <li id="menu-item" class='menu-item menu-item-type-post_type menu-item-object-page current-menu-item current_page_item'>
+                                <a href="/post/about">关于</a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+</header>
+
+        <div class="main-content">
+            <div class="current-tag-container">
+                <h2 class="title">
+                    标签：#前端
+                </h2>
+            </div>
+        </div>
+    <div id="main" class="main" role="main">
+  <h1 class="screen-reader-text">Posts</h1>
+  
+  <div id="loop-container" class="loop-container">
+    <div class="post type-post status-publish format-standard   has-post-thumbnail hentry category-design tag-memories
+    tag-normal-post tag-standard-2 excerpt zoom full-without-featured
+      
+      even
+       excerpt">
+      
+      <a class="featured-image-link" href="https://toxicfy.github.io//post/historyIllegale">
+        <div class='featured-image lazy lazy-bg-image' data-background="https://toxicfy.github.io//post-images/historyIllegale.jpeg"></div>
       </a>
-      <div class="menu-btn" @click="menuVisible = !menuVisible">
-        <div class="line"></div>
-      </div>
-    </div>
-    <div>
       
-        
-          <a href="/" class="site-nav">
-            首页
-          </a>
-        
-      
-        
-          <a href="/archives" class="site-nav">
-            归档
-          </a>
-        
-      
-        
-          <a href="/tags" class="site-nav">
-            标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="site-nav">
-            关于
-          </a>
-        
-      
-    </div>
-  </div>
-  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
-    <div class="social-container">
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    </div>
-    <div class="site-description">
-      斯人若彩虹,遇上方知有
-    </div>
-    <div class="site-footer">
-      © 2018-2019 · @fy - 一个程序员的小窝 | <a class="rss" href="https://toxicfy.github.io//atom.xml" target="_blank">RSS</a>
-    </div>
-  </div>
-</div>
+      <div class="excerpt-container">
+        <div class="excerpt-meta">
+          <span class="date">  · 2019-05-09 ·</span> <span> / </span>
+          <span class="author">
+              <a href="https://toxicfy.github.io/" title="Posts by  Fy的个人小站" rel="author"> Fy的个人小站</a>
+          </span>
+            
+                <span> / </span>
+                <span class="category">
+                        <a href="https://toxicfy.github.io//tag/front-end">前端</a>
+                </span>
+            
+                <span> / </span>
+                <span class="category">
+                        <a href="https://toxicfy.github.io//tag/project-summary">项目总结</a>
+                </span>
+            
 
+        </div>
+        <div class='excerpt-header'>
+          <h2 class='excerpt-title'>
+            <a href="https://toxicfy.github.io//post/historyIllegale"> 项目维护 -- 历史违建处理模块 </a>
+          </h2>
+        </div>
+        <div class='excerpt-content'>
+          <article>
+              <p>这是项目维护期中需要添加的功能模块：其实可以算是在原有的系统上添加一个小型的管理系统了；这里从文件上传、iframe页面数据访问，数据渲染部分总结一下；</p>
 
-      <div class="main-container">
-        <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: 前端</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://toxicfy.github.io//post/historyIllegale">
-                  <h2 class="post-title">项目维护 -- 历史违建处理模块</h2>
-                </a>
-                <div class="post-date">
-                  2019-05-09
-                </div>
-                <div class="post-abstract">
-                  <p>这是项目维护期中需要添加的功能模块：其实可以算是在原有的系统上添加一个小型的管理系统了；这里从文件上传、iframe页面数据访问，数据渲染部分总结一下；</p>
-
-                </div>
-              </div>
-              
-                <a class="right" href="https://toxicfy.github.io//post/historyIllegale">
-                  <div class="feature-container" style="background-image: url('https://toxicfy.github.io//post-images/historyIllegale.jpeg')">
-                  </div>
-                </a>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong">
-                  <h2 class="post-title">项目总结 -- webAr建筑管理系统</h2>
-                </a>
-                <div class="post-date">
-                  2019-01-23
-                </div>
-                <div class="post-abstract">
-                  <blockquote>
-<p>其实这里有点标题党的嫌疑，其实这个项目在一月初的时间已经完成了，因为是 <code>webAr</code> 项目的初始应用（没有使用打包工具和 cli ），加上业务逻辑很复杂，所以这里实际上是基于 <code>Vue-li</code>下对于项目的总结</p>
-</blockquote>
-
-                </div>
-              </div>
-              
-                <a class="right" href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong">
-                  <div class="feature-container" style="background-image: url('https://toxicfy.github.io//post-images/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong.jpg')">
-                  </div>
-                </a>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang">
-                  <h2 class="post-title">项目总结 -- 智慧桥梁</h2>
-                </a>
-                <div class="post-date">
-                  2018-03-14
-                </div>
-                <div class="post-abstract">
-                  <blockquote>
-<p>项目中总结出一些常见问题，顺便熟悉开发中出现的<code>API</code>；</p>
-</blockquote>
-
-                </div>
-              </div>
-              
-                <a class="right" href="https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang">
-                  <div class="feature-container" style="background-image: url('https://toxicfy.github.io//post-images/xiang-mu-zong-jie-zhi-hui-qiao-liang.png')">
-                  </div>
-                </a>
-              
-            </article>
-          
-
-          <div class="pagination-container">
-  
-  
-</div>
-
+          </article>
         </div>
       </div>
     </div>
+  </div>
+  
+  <div id="loop-container" class="loop-container">
+    <div class="post type-post status-publish format-standard   has-post-thumbnail hentry category-design tag-memories
+    tag-normal-post tag-standard-2 excerpt zoom full-without-featured
+      
+        odd
+       excerpt">
+      
+      <a class="featured-image-link" href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong">
+        <div class='featured-image lazy lazy-bg-image' data-background="https://toxicfy.github.io//post-images/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong.jpg"></div>
+      </a>
+      
+      <div class="excerpt-container">
+        <div class="excerpt-meta">
+          <span class="date">  · 2019-01-23 ·</span> <span> / </span>
+          <span class="author">
+              <a href="https://toxicfy.github.io/" title="Posts by  Fy的个人小站" rel="author"> Fy的个人小站</a>
+          </span>
+            
+                <span> / </span>
+                <span class="category">
+                        <a href="https://toxicfy.github.io//tag/front-end">前端</a>
+                </span>
+            
+                <span> / </span>
+                <span class="category">
+                        <a href="https://toxicfy.github.io//tag/project-summary">项目总结</a>
+                </span>
+            
 
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        </div>
+        <div class='excerpt-header'>
+          <h2 class='excerpt-title'>
+            <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong"> 项目总结 -- webAr建筑管理系统 </a>
+          </h2>
+        </div>
+        <div class='excerpt-content'>
+          <article>
+              <blockquote>
+<p>其实这里有点标题党的嫌疑，其实这个项目在一月初的时间已经完成了，因为是 <code>webAr</code> 项目的初始应用（没有使用打包工具和 cli ），加上业务逻辑很复杂，所以这里实际上是基于 <code>Vue-li</code>下对于项目的总结</p>
+</blockquote>
 
-<script type="application/javascript">
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="loop-container" class="loop-container">
+    <div class="post type-post status-publish format-standard   has-post-thumbnail hentry category-design tag-memories
+    tag-normal-post tag-standard-2 excerpt zoom full-without-featured
+      
+      even
+       excerpt">
+      
+      <a class="featured-image-link" href="https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang">
+        <div class='featured-image lazy lazy-bg-image' data-background="https://toxicfy.github.io//post-images/xiang-mu-zong-jie-zhi-hui-qiao-liang.png"></div>
+      </a>
+      
+      <div class="excerpt-container">
+        <div class="excerpt-meta">
+          <span class="date">  · 2018-03-14 ·</span> <span> / </span>
+          <span class="author">
+              <a href="https://toxicfy.github.io/" title="Posts by  Fy的个人小站" rel="author"> Fy的个人小站</a>
+          </span>
+            
+                <span> / </span>
+                <span class="category">
+                        <a href="https://toxicfy.github.io//tag/front-end">前端</a>
+                </span>
+            
+                <span> / </span>
+                <span class="category">
+                        <a href="https://toxicfy.github.io//tag/project-summary">项目总结</a>
+                </span>
+            
 
-AOS.init();
+        </div>
+        <div class='excerpt-header'>
+          <h2 class='excerpt-title'>
+            <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang"> 项目总结 -- 智慧桥梁 </a>
+          </h2>
+        </div>
+        <div class='excerpt-content'>
+          <article>
+              <blockquote>
+<p>项目中总结出一些常见问题，顺便熟悉开发中出现的<code>API</code>；</p>
+</blockquote>
 
-hljs.initHighlightingOnLoad()
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+    <nav class="navigation pagination" role="navigation">
+    <h2 class="screen-reader-text">Posts navigation</h2>
+    <div class="nav-links">
+        
+        
+    </div>
+</nav>
 
+    <footer id="site-footer" class="site-footer" role="contentinfo">
+    <h1>
+        <a href="https://toxicfy.github.io/"> Fy的个人小站 </a>
+    </h1>
+    <p class="site-description">斯人若彩虹,遇上方知有</p>
+    <div id="menu-footer" class="menu-container menu-footer" role="navigation">
+        <div class="menu">
+            <ul id="menu-footer-items" class="menu-footer-items">
+            </ul>
+        </div>
+    </div>
+    <ul class="social-media-icons">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </ul>
+    <div class="design-credit">
+        <p>© 2018-2019 · @fy - 一个程序员的小窝</p>
+    </div>
+</footer>
+<script>
+    hljs.initHighlightingOnLoad()
 </script>
+<script src="https://toxicfy.github.io//media/scripts/lib/jquery.min.js"></script>
+<script src="https://toxicfy.github.io//media/scripts/lib/jquerymigrate.js"></script>
+<script src="https://toxicfy.github.io//media/scripts/lib/production.min.js"></script>
 
-
-
-
-  </body>
+</div>
+</body>
 </html>
