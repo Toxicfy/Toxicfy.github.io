@@ -27697,7 +27697,12 @@ body {
   }
 }
 
-      body {
- background: url('https://pic.superbed.cn/item/5d57fe97451253d178b65af6.jpg')
+      /* 背景图片 */
+body {
+  background: url('https://pic.superbed.cn/item/5d57fe97451253d178b65af6.jpg');
+}
+/* 首页简介 */
+.post-abstract {
+  font-size: 14px;
 }
     
