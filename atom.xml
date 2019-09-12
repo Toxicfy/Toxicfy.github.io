@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://toxicfy.github.io/</id>
     <title>Fy的个人小站</title>
-    <updated>2019-09-12T08:47:59.240Z</updated>
+    <updated>2019-09-12T08:52:31.863Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://toxicfy.github.io/"/>
     <link rel="self" href="https://toxicfy.github.io//atom.xml"/>
@@ -10,14 +10,16 @@
     <icon>https://toxicfy.github.io//favicon.ico</icon>
     <rights>All rights reserved 2019, Fy的个人小站</rights>
     <entry>
-        <title type="html"><![CDATA[基于 Vue 全家桶 + Koa2 + MongoDB 实现登录注册及鉴权]]></title>
+        <title type="html"><![CDATA[前后端协作 -- 基于 JWT 实现登录注册及鉴权]]></title>
         <id>https://toxicfy.github.io//post/vue-koa2-login-regisiter</id>
         <link href="https://toxicfy.github.io//post/vue-koa2-login-regisiter">
         </link>
         <updated>2019-07-19T06:05:40.000Z</updated>
-        <summary type="html"><![CDATA[<p>因为公司的服务端是 <code>C#</code>, 之前快速开发的应用使用前后端耦合开发；由于目前项目已经前后端分离开发，所以这里通过一个基于 <code>Vue</code> + <code>koa2</code> +<code>MongoDB</code>完成注册、登录功能并使用<code>token</code> 认证的方式进行权限控制，以便于了解前后端分离的数据交互</p>
+        <summary type="html"><![CDATA[<p>因为公司的服务端是 <code>C#</code>, 之前快速开发的应用使用前后端耦合开发；由于目前项目已经前后端分离开发。<br>
+这里通过一个基于 <strong><code>Vue全家桶</code> + <code>koa2</code> +<code>MongoDB</code></strong> 完成注册、登录功能并使用<code>token</code> 认证的方式进行权限控制，以便于了解前后端分离的数据交互</p>
 ]]></summary>
-        <content type="html"><![CDATA[<p>因为公司的服务端是 <code>C#</code>, 之前快速开发的应用使用前后端耦合开发；由于目前项目已经前后端分离开发，所以这里通过一个基于 <code>Vue</code> + <code>koa2</code> +<code>MongoDB</code>完成注册、登录功能并使用<code>token</code> 认证的方式进行权限控制，以便于了解前后端分离的数据交互</p>
+        <content type="html"><![CDATA[<p>因为公司的服务端是 <code>C#</code>, 之前快速开发的应用使用前后端耦合开发；由于目前项目已经前后端分离开发。<br>
+这里通过一个基于 <strong><code>Vue全家桶</code> + <code>koa2</code> +<code>MongoDB</code></strong> 完成注册、登录功能并使用<code>token</code> 认证的方式进行权限控制，以便于了解前后端分离的数据交互</p>
  <!-- more -->
 <h2 id="基本思路">基本思路</h2>
 <blockquote>
