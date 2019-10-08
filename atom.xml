@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://toxicfy.github.io/</id>
     <title>Fy的个人小站</title>
-    <updated>2019-09-12T08:52:31.863Z</updated>
+    <updated>2019-10-08T17:10:34.750Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://toxicfy.github.io/"/>
     <link rel="self" href="https://toxicfy.github.io//atom.xml"/>
@@ -28,7 +28,7 @@
 <blockquote>
 <p>除了静态数据以及登录注册，其他接口的访问均需要 <code>Header</code> 携带 <code>token</code>值，以便于服务端进行 <code>token</code> 校验后返回需要的数据, 进而完成数据交互</p>
 </blockquote>
-<p><img src="https://ae01.alicdn.com/kf/HTB14xWWaKP2gK0jSZFo761uIVXaK.png" alt=""></p>
+<figure data-type="image" tabindex="1"><img src="https://ae01.alicdn.com/kf/HTB14xWWaKP2gK0jSZFo761uIVXaK.png" alt=""></figure>
 <h2 id="前端实现">前端实现</h2>
 <hr>
 <p>关于页面的实现数据提交获取以及 <code>Vuex</code> 的使用比较简单，这里不进行介绍；前端部分主要记录路由部分的控制和 <code>axios</code> 拦截的实现</p>
@@ -337,7 +337,7 @@ $('#historyIllegaleModal').on('shown.bs.modal', e =&gt; {
 </code></pre>
 <h3 id="卫片对比区域渲染">卫片对比区域渲染</h3>
 <p>在触发卫片对比功能中中依据主页面选中需要渲染的类型，其中绘制行政区划部分（为文字标注和区域划分两个部分）;</p>
-<p><img src="https://toxicfy.github.io//post-images/1557892099842.png" alt="process"></p>
+<figure data-type="image" tabindex="1"><img src="https://toxicfy.github.io//post-images/1557892099842.png" alt="process"></figure>
 <blockquote>
 <p>构建标注图层</p>
 </blockquote>
