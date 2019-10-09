@@ -31,30 +31,25 @@
       
         <div class="animated fadeInLeft" style="animation-delay: 0.4s">
           <p class="my-4 text-gray-600 font-light hidden lg:block">
-            
+            文章目录
           </p>
-          <div class="animated fadeInLeft social-container hidden lg:block" style="animation-delay: 0.6s">
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
+          <div class="toc-container hidden lg:block">
+            <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#tcpip-%E5%8D%8F%E8%AE%AE%E6%97%8F"><code>TCP/IP</code> 协议族</a>
+<ul>
+<li><a href="#tcp%E7%9A%84%E7%A1%AE%E4%BF%9D%E5%8F%AF%E9%9D%A0%E6%80%A7">TCP的确保可靠性</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
           </div>
         </div>
       
@@ -98,76 +93,76 @@
 </div>
 <div class="mask" onclick="closeMenu()">
 </div>
-      <div class="content-wrapper py-32 lg:p-8 lg:w-3/4">
-        <h2 class="text-lg text-gray-700 mb-8">
-          <i class="remixicon-bookmark-line"></i> 项目总结
-        </h2>
+      <div class="content-wrapper py-32 lg:p-8 lg:w-3/4 post-detail animated fadeIn">
+        <h1 class="text-3xl font-bold lg:mt-16">书籍总结- 《图解HTTP》</h1>
+        <div class="text-sm text-gray-700 lg:my-8">
+          2019-10-09 / 2 min read
+        </div>
         
-  <section class="post-item md:flex pb-12 animated fadeIn" :style="{ 'animation-delay': `${0 * 0.2}s` }">
-    
-      <a href="https://toxicfy.github.io//post/historyIllegale" class="feature-image-wrapper bg-gray-100 rounded-lg flex-shrink-0 mr-8 w-full h-56 h-32 md:w-56 md:h-40">
-        <div class="post-feature-image lazy w-full h-56 h-32 md:w-56 md:h-40" data-bg="'https://toxicfy.github.io//post-images/historyIllegale.jpeg'">
+        <div class="post-content yue">
+          <p>Web<code>是建立在</code>HTTP<code>协议上通信的，而</code>HTTP<code>是</code>TCP/IP` 协议族内部的一个子集。</p>
+<h3 id="tcpip-协议族"><code>TCP/IP</code> 协议族</h3>
+<p>为了满足不同的硬件、操作系统之间的通信，需要制定约束的规则，而这些规则也就称为<strong>协议</strong>；而 <code>TCP/IP</code> 指的是 <code>TCP</code> 和 <code>IP</code> 两种协议，也有说法是 <code>IP</code> 协议通信过程中，使用到的协议族的统称。</p>
+<p><code>TCP/IP</code> 协议族是<strong>基于分层进行管理</strong>的，分层化的设计使得改动以及任务划分更加清晰；</p>
+<figure data-type="image" tabindex="1"><img src="https://pic.superbed.cn/item/5d9da3b2451253d178933125.png" alt="TCP/IP分层"></figure>
+<p>在发送请求的时候，客户端在<strong>应用层</strong>（<code>HTTP</code>协议）发出一个请求，生成请求的<code>HTTP</code>报文，为了传输方便，在<strong>传输层</strong>（<code>TCP</code>协议）将获取到的报文切割成报文段转发给<strong>网络层</strong>（IP协议），搜索对方的地址后转发给<strong>链路层</strong>； 同样的服务器端按照倒序，直到服务端应用层接收重组出HTTP报文，请求才算接受完成。</p>
+<h4 id="tcp的确保可靠性">TCP的确保可靠性</h4>
+<p>相比较<code>UDP</code>为面向非连接的协议，<code>TCP</code>协议则是在发送数据前需要建立可靠的连接；通常<code>TCP</code>协议通过三次握手的策略以及<code>Flag</code>（<code>SYN</code>，<code>ACK</code>）标志来保证通信的可靠性。</p>
+<figure data-type="image" tabindex="2"><img src="https://pic.superbed.cn/item/5d9daa02451253d178972142.png" alt="三次握手"></figure>
+<ul>
+<li>发送端首先发送一个带 <code>SYN</code> 标志的数据包给对方</li>
+<li>接收端收到后，回传一个带有 <code>SYN/ACK</code> 标志的数据包以示传达确认信息</li>
+<li>最后，发送端再回传一个带 <code>ACK</code> 标志的数据包，代表“握手”结束</li>
+</ul>
+<p>若在握手过程中某个阶段莫名中断，<code>TCP 协议</code>会再次以相同的顺序发送相同的数据包。</p>
+
         </div>
-      </a>
-    
-    <div class="content">
-      <a href="https://toxicfy.github.io//post/historyIllegale">
-        <h2 class="post-title text-xl font-extrabold mt-5 md:mt-0">项目维护 -- 历史违建处理模块</h2>
-      </a>
-      <div class="post-abstract text-gray-700 font-light my-4">
-        <p>这是项目维护期中需要添加的功能模块：其实可以算是在原有的系统上添加一个小型的管理系统了；这里从文件上传、iframe页面数据访问，数据渲染部分总结一下；</p>
 
-      </div>
-      <div class="text-gray-400 text-sm font-light">2019-05-09 / 7 min read</div>
-    </div>
-  </section>
+        
 
-  <section class="post-item md:flex pb-12 animated fadeIn" :style="{ 'animation-delay': `${1 * 0.2}s` }">
-    
-      <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong" class="feature-image-wrapper bg-gray-100 rounded-lg flex-shrink-0 mr-8 w-full h-56 h-32 md:w-56 md:h-40">
-        <div class="post-feature-image lazy w-full h-56 h-32 md:w-56 md:h-40" data-bg="'https://toxicfy.github.io//post-images/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong.jpg'">
+
+        <div class="flex justify-between py-8">
+          
+
+          
+            <div class="next-post">
+              <a href="https://toxicfy.github.io//post/vue-koa2-login-regisiter">
+                <h3 class="post-title">
+                  前后端协作 -- 基于 JWT 实现登录注册及鉴权
+                  <i class="remixicon-arrow-right-line"></i>
+                </h3>
+              </a>
+            </div>
+          
         </div>
-      </a>
-    
-    <div class="content">
-      <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong">
-        <h2 class="post-title text-xl font-extrabold mt-5 md:mt-0">项目总结 -- webAr建筑管理系统</h2>
-      </a>
-      <div class="post-abstract text-gray-700 font-light my-4">
-        <blockquote>
-<p>其实这里有点标题党的嫌疑，其实这个项目在一月初的时间已经完成了，因为是 <code>webAr</code> 项目的初始应用（没有使用打包工具和 cli ），加上业务逻辑很复杂，所以这里实际上是基于 <code>Vue-li</code>下对于项目的总结</p>
-</blockquote>
 
-      </div>
-      <div class="text-gray-400 text-sm font-light">2019-01-23 / 5 min read</div>
-    </div>
-  </section>
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
 
-  <section class="post-item md:flex pb-12 animated fadeIn" :style="{ 'animation-delay': `${2 * 0.2}s` }">
-    
-      <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang" class="feature-image-wrapper bg-gray-100 rounded-lg flex-shrink-0 mr-8 w-full h-56 h-32 md:w-56 md:h-40">
-        <div class="post-feature-image lazy w-full h-56 h-32 md:w-56 md:h-40" data-bg="'https://toxicfy.github.io//post-images/xiang-mu-zong-jie-zhi-hui-qiao-liang.png'">
-        </div>
-      </a>
-    
-    <div class="content">
-      <a href="https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang">
-        <h2 class="post-title text-xl font-extrabold mt-5 md:mt-0">项目总结 -- 智慧桥梁</h2>
-      </a>
-      <div class="post-abstract text-gray-700 font-light my-4">
-        <blockquote>
-<p>项目中总结出一些常见问题，顺便熟悉开发中出现的<code>API</code>；</p>
-</blockquote>
+<div id="gitalk-container"></div>
 
-      </div>
-      <div class="text-gray-400 text-sm font-light">2018-03-14 / 6 min read</div>
-    </div>
-  </section>
+<script>
 
-        <div class="pagination-container animated fadeIn">
-  
-  
-</div>
+  var gitalk = new Gitalk({
+    clientID: '972d46b2bdee9b64974d',
+    clientSecret: '1e1d55e34cefa26773f1e9490300ca5d08bb13b9',
+    repo: 'toxicfy.github.io',
+    owner: 'fy',
+    admin: ['fy'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
 
       </div>
     </div>

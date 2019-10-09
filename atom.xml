@@ -2,13 +2,36 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://toxicfy.github.io/</id>
     <title>Fy的个人小站</title>
-    <updated>2019-10-08T17:10:34.750Z</updated>
+    <updated>2019-10-09T15:56:28.174Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://toxicfy.github.io/"/>
     <link rel="self" href="https://toxicfy.github.io//atom.xml"/>
     <logo>https://toxicfy.github.io//images/avatar.png</logo>
     <icon>https://toxicfy.github.io//favicon.ico</icon>
     <rights>All rights reserved 2019, Fy的个人小站</rights>
+    <entry>
+        <title type="html"><![CDATA[书籍总结- 《图解HTTP》]]></title>
+        <id>https://toxicfy.github.io//post/shu-ji-zong-jie-tu-jie-http</id>
+        <link href="https://toxicfy.github.io//post/shu-ji-zong-jie-tu-jie-http">
+        </link>
+        <updated>2019-10-09T02:42:04.000Z</updated>
+        <content type="html"><![CDATA[<p>Web<code>是建立在</code>HTTP<code>协议上通信的，而</code>HTTP<code>是</code>TCP/IP` 协议族内部的一个子集。</p>
+<h3 id="tcpip-协议族"><code>TCP/IP</code> 协议族</h3>
+<p>为了满足不同的硬件、操作系统之间的通信，需要制定约束的规则，而这些规则也就称为<strong>协议</strong>；而 <code>TCP/IP</code> 指的是 <code>TCP</code> 和 <code>IP</code> 两种协议，也有说法是 <code>IP</code> 协议通信过程中，使用到的协议族的统称。</p>
+<p><code>TCP/IP</code> 协议族是<strong>基于分层进行管理</strong>的，分层化的设计使得改动以及任务划分更加清晰；</p>
+<figure data-type="image" tabindex="1"><img src="https://pic.superbed.cn/item/5d9da3b2451253d178933125.png" alt="TCP/IP分层"></figure>
+<p>在发送请求的时候，客户端在<strong>应用层</strong>（<code>HTTP</code>协议）发出一个请求，生成请求的<code>HTTP</code>报文，为了传输方便，在<strong>传输层</strong>（<code>TCP</code>协议）将获取到的报文切割成报文段转发给<strong>网络层</strong>（IP协议），搜索对方的地址后转发给<strong>链路层</strong>； 同样的服务器端按照倒序，直到服务端应用层接收重组出HTTP报文，请求才算接受完成。</p>
+<h4 id="tcp的确保可靠性">TCP的确保可靠性</h4>
+<p>相比较<code>UDP</code>为面向非连接的协议，<code>TCP</code>协议则是在发送数据前需要建立可靠的连接；通常<code>TCP</code>协议通过三次握手的策略以及<code>Flag</code>（<code>SYN</code>，<code>ACK</code>）标志来保证通信的可靠性。</p>
+<figure data-type="image" tabindex="2"><img src="https://pic.superbed.cn/item/5d9daa02451253d178972142.png" alt="三次握手"></figure>
+<ul>
+<li>发送端首先发送一个带 <code>SYN</code> 标志的数据包给对方</li>
+<li>接收端收到后，回传一个带有 <code>SYN/ACK</code> 标志的数据包以示传达确认信息</li>
+<li>最后，发送端再回传一个带 <code>ACK</code> 标志的数据包，代表“握手”结束</li>
+</ul>
+<p>若在握手过程中某个阶段莫名中断，<code>TCP 协议</code>会再次以相同的顺序发送相同的数据包。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[前后端协作 -- 基于 JWT 实现登录注册及鉴权]]></title>
         <id>https://toxicfy.github.io//post/vue-koa2-login-regisiter</id>
