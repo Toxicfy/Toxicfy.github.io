@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://toxicfy.github.io/</id>
     <title>Fy的个人小站</title>
-    <updated>2019-10-09T15:56:28.174Z</updated>
+    <updated>2019-10-09T16:47:48.589Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://toxicfy.github.io/"/>
     <link rel="self" href="https://toxicfy.github.io//atom.xml"/>
@@ -10,18 +10,23 @@
     <icon>https://toxicfy.github.io//favicon.ico</icon>
     <rights>All rights reserved 2019, Fy的个人小站</rights>
     <entry>
-        <title type="html"><![CDATA[书籍总结- 《图解HTTP》]]></title>
+        <title type="html"><![CDATA[书籍笔录  --《图解HTTP》]]></title>
         <id>https://toxicfy.github.io//post/shu-ji-zong-jie-tu-jie-http</id>
         <link href="https://toxicfy.github.io//post/shu-ji-zong-jie-tu-jie-http">
         </link>
         <updated>2019-10-09T02:42:04.000Z</updated>
-        <content type="html"><![CDATA[<p>Web<code>是建立在</code>HTTP<code>协议上通信的，而</code>HTTP<code>是</code>TCP/IP` 协议族内部的一个子集。</p>
-<h3 id="tcpip-协议族"><code>TCP/IP</code> 协议族</h3>
+        <summary type="html"><![CDATA[<p>工作打交道最多的还是浏览器，对于输入<code>URL</code>到页面呈现的步骤类似的文章其实也是看了不少，但是还是觉得差点什么；最后选了《图解HTTP》这本书，基本也覆盖了<code>HTTP</code>协议中的大部分内容，自己也进行了知识点提炼和总结，在这里记录一下；</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>工作打交道最多的还是浏览器，对于输入<code>URL</code>到页面呈现的步骤类似的文章其实也是看了不少，但是还是觉得差点什么；最后选了《图解HTTP》这本书，基本也覆盖了<code>HTTP</code>协议中的大部分内容，自己也进行了知识点提炼和总结，在这里记录一下；</p>
+<!-- more -->
+<h2 id="uweb及网络基础u"><u>Web及网络基础</u></h2>
+<p>Web 是建立在 <code>HTTP</code> 协议上通信的，而 <code>HTTP</code> 是 <code>TCP/IP</code> 协议族内部的一个子集。</p>
+<h3 id="tcpip-协议族">📌<code>TCP/IP</code> 协议族</h3>
 <p>为了满足不同的硬件、操作系统之间的通信，需要制定约束的规则，而这些规则也就称为<strong>协议</strong>；而 <code>TCP/IP</code> 指的是 <code>TCP</code> 和 <code>IP</code> 两种协议，也有说法是 <code>IP</code> 协议通信过程中，使用到的协议族的统称。</p>
 <p><code>TCP/IP</code> 协议族是<strong>基于分层进行管理</strong>的，分层化的设计使得改动以及任务划分更加清晰；</p>
 <figure data-type="image" tabindex="1"><img src="https://pic.superbed.cn/item/5d9da3b2451253d178933125.png" alt="TCP/IP分层"></figure>
 <p>在发送请求的时候，客户端在<strong>应用层</strong>（<code>HTTP</code>协议）发出一个请求，生成请求的<code>HTTP</code>报文，为了传输方便，在<strong>传输层</strong>（<code>TCP</code>协议）将获取到的报文切割成报文段转发给<strong>网络层</strong>（IP协议），搜索对方的地址后转发给<strong>链路层</strong>； 同样的服务器端按照倒序，直到服务端应用层接收重组出HTTP报文，请求才算接受完成。</p>
-<h4 id="tcp的确保可靠性">TCP的确保可靠性</h4>
+<h3 id="tcp的确保可靠性">📌TCP的确保可靠性</h3>
 <p>相比较<code>UDP</code>为面向非连接的协议，<code>TCP</code>协议则是在发送数据前需要建立可靠的连接；通常<code>TCP</code>协议通过三次握手的策略以及<code>Flag</code>（<code>SYN</code>，<code>ACK</code>）标志来保证通信的可靠性。</p>
 <figure data-type="image" tabindex="2"><img src="https://pic.superbed.cn/item/5d9daa02451253d178972142.png" alt="三次握手"></figure>
 <ul>
@@ -30,6 +35,15 @@
 <li>最后，发送端再回传一个带 <code>ACK</code> 标志的数据包，代表“握手”结束</li>
 </ul>
 <p>若在握手过程中某个阶段莫名中断，<code>TCP 协议</code>会再次以相同的顺序发送相同的数据包。</p>
+<h3 id="ip协议-路由选择及数据传输">📌IP协议 - 路由选择及数据传输</h3>
+<p>位于网络层的<code>IP</code>协议的主要作用就是各种数据包的传送；</p>
+<p><code>IP</code>协议不提供可靠的传输服务，只是尽自己最大努力支付来传输数据包，可靠性由上层协议提供（<code>TCP</code>协议） <code>IP</code>协议也是一种无连接协议，事先不会建立会话</p>
+<h4 id="ip地址及mac地址">IP地址及MAC地址</h4>
+<p><code>IP</code> 地址指明了节点被分配到的地址，<code>MAC</code> 地址是指网卡所属的固定地址。<code>IP</code> 地址可以和 <code>MAC</code> 地址进行配对</p>
+<p>，依据<code>ARP</code>协议，可以通过<code>IP</code>地址反查出对应的<code>MAC</code>地址</p>
+<h4 id="arp协议">ARP协议</h4>
+<p><code>ARP</code> 同样也是网络层协议，<strong><u><em>可以通过目标主机的IP地址，查询解析目标主机的MAC地址</em></u></strong>；中转时利用下一站设备的MAC地址继续搜索下一个中转对象；</p>
+<p>每台主机在自己的ARP缓存区中都有一个ARP列表，保存了是近期与自己有过通信的主机的IP地址和MAC地址之间的对应关系。在进行数据中转的时候，向本网段的所有主机发送一个携带IP地址的ARP请求数据包，收到后查询自己的IP地址，是否符合条件；</p>
 ]]></content>
     </entry>
     <entry>
