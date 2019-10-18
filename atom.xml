@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://toxicfy.github.io/</id>
     <title>Fy的个人小站</title>
-    <updated>2019-10-09T16:47:48.589Z</updated>
+    <updated>2019-10-18T09:17:44.576Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://toxicfy.github.io/"/>
     <link rel="self" href="https://toxicfy.github.io//atom.xml"/>
@@ -34,16 +34,40 @@
 <li>接收端收到后，回传一个带有 <code>SYN/ACK</code> 标志的数据包以示传达确认信息</li>
 <li>最后，发送端再回传一个带 <code>ACK</code> 标志的数据包，代表“握手”结束</li>
 </ul>
-<p>若在握手过程中某个阶段莫名中断，<code>TCP 协议</code>会再次以相同的顺序发送相同的数据包。</p>
+<p>若在握手过程中某个阶段莫名中断，<code>TCP 协议</code>会再次以相同的顺序发送相同的数据包。<br>
+同时<code>TCP</code>协议可以提供字节流服务，这样当HTTP报文主体的数据较大的时候，更易于传输（例如：大图加载的时候是一块一块进行加载）</p>
 <h3 id="ip协议-路由选择及数据传输">📌IP协议 - 路由选择及数据传输</h3>
 <p>位于网络层的<code>IP</code>协议的主要作用就是各种数据包的传送；</p>
-<p><code>IP</code>协议不提供可靠的传输服务，只是尽自己最大努力支付来传输数据包，可靠性由上层协议提供（<code>TCP</code>协议） <code>IP</code>协议也是一种无连接协议，事先不会建立会话</p>
+<p><code>IP</code>协议不提供可靠的传输服务，只是尽自己最大努力支付来传输数据包，可靠性由上层协议提供（<code>TCP</code>协议） <code>IP</code>协议也是一种无连接协议，事先不会建立会话；</p>
 <h4 id="ip地址及mac地址">IP地址及MAC地址</h4>
 <p><code>IP</code> 地址指明了节点被分配到的地址，<code>MAC</code> 地址是指网卡所属的固定地址。<code>IP</code> 地址可以和 <code>MAC</code> 地址进行配对</p>
 <p>，依据<code>ARP</code>协议，可以通过<code>IP</code>地址反查出对应的<code>MAC</code>地址</p>
 <h4 id="arp协议">ARP协议</h4>
 <p><code>ARP</code> 同样也是网络层协议，<strong><u><em>可以通过目标主机的IP地址，查询解析目标主机的MAC地址</em></u></strong>；中转时利用下一站设备的MAC地址继续搜索下一个中转对象；</p>
 <p>每台主机在自己的ARP缓存区中都有一个ARP列表，保存了是近期与自己有过通信的主机的IP地址和MAC地址之间的对应关系。在进行数据中转的时候，向本网段的所有主机发送一个携带IP地址的ARP请求数据包，收到后查询自己的IP地址，是否符合条件；</p>
+<h2 id="http-协议及报文简述">HTTP 协议及报文简述</h2>
+<p><code>HTTP</code> 协议规定在数据由客户端开始建立通信，而服务端没有获得请求之前不会进行响应，所以在一条通信线路来说，<code>HTTP</code> 协议可以明确区分哪一端是客户端，哪一端是服务端。</p>
+<h3 id="http-协议的特性">📎HTTP 协议的特性</h3>
+<ul>
+<li>
+<p><strong>无状态</strong></p>
+<p><code>HTTP</code> 协议不会对请求和响应之间的状态做出保存，即：对于发送过的请求和响应不做持久化处理（这样的设计有利于快速的处理大量的事务），在 <code>HTTP</code> 1.1 中可以可以通过 <code>cookie</code> 进行管理状态满足业务需求</p>
+</li>
+<li>
+<p><strong>持久连接</strong></p>
+<p>在初始的 <code>HTTP</code> 协议中，每进行一次 <code>HTTP</code> 通信需要断开一次 <code>TCP</code> 连接，但请求包含多个图片的文档时候，会频繁断开 <code>TCP</code> 连接，所以在后期的版本中（1.0 部分及 1.1 之后）采用了持久连接的方法。 其特点是： 只要任意一端没有明确的提出断开连接则继续保持 <code>TCP</code> 的连接状态</p>
+</li>
+<li>
+<p><strong>管线化</strong></p>
+<p>因为持久连使得多数请求可以以管线化的方式进行发送请求，使得可以不用等待一个请求完成就可以继续发送，可以做到**<u>并行发送</u>**多个请求。 使用管线化的方式可以使得请求更快的结束，请求数目越多，时间差越明显；</p>
+</li>
+<li>
+<p><strong>基于 <code>Cookie</code> 的状态管理</strong></p>
+<p>由于 <code>HTTP</code> 协议为了减少服务器及内存的消耗被设计为无状态，但是各种业务中则需要保存登录状态等需求，于是引入了 <code>Cookie</code> 技术。</p>
+<p><code>Cookie</code> 技术通过在请求和响应报文中写入 <code>cookie</code> 信息来控制客户端的状态。<code>Cookie</code> 会根据从服务器端发送的响应报文内的一个叫做 <code>Set-Cookie</code> 的首部字段信息，通知客户端保存 <code>Cookie</code>。当下次客户端再往该服务器发送请求时，客户端会自动在请求报文中加入 <code>Cookie</code> 值后发送出去。</p>
+<p>当在 <code>cookie</code> 中设置了 <code>HttpOnly</code> 属性，那么通过 js 脚本将无法读取到 <code>cookie</code> 信息，这样能有效的防止  <code>XSS</code> 攻击。</p>
+</li>
+</ul>
 ]]></content>
     </entry>
     <entry>
