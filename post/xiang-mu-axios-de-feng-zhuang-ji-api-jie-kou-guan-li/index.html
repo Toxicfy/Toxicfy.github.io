@@ -31,30 +31,26 @@
       
         <div class="animated fadeInLeft" style="animation-delay: 0.4s">
           <p class="my-4 text-gray-600 font-light hidden lg:block">
-            
+            文章目录
           </p>
-          <div class="animated fadeInLeft social-container hidden lg:block" style="animation-delay: 0.6s">
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
+          <div class="toc-container hidden lg:block">
+            <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#axios-%E5%B0%81%E8%A3%85">Axios 封装</a>
+<ul>
+<li><a href="#%E5%8C%BA%E5%88%86%E7%8E%AF%E5%A2%83-baseurl%E8%B6%85%E6%97%B6%E8%AF%B7%E6%B1%82%E5%A4%B4%E6%A0%BC%E5%BC%8F%E4%BF%AE%E6%94%B9">区分环境 baseURL/超时/请求头格式修改</a></li>
+<li><a href="#%E8%AF%B7%E6%B1%82-%E5%93%8D%E5%BA%94%E5%A4%84%E7%90%86%E6%8B%A6%E6%88%AA%E5%99%A8">请求、响应处理拦截器</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
           </div>
         </div>
       
@@ -98,119 +94,153 @@
 </div>
 <div class="mask" onclick="closeMenu()">
 </div>
-      <div class="content-wrapper py-32 lg:p-8 lg:w-3/4">
-        <h2 class="text-lg text-gray-700 mb-8">
-          <i class="remixicon-archive-line"></i> 文章归档
-        </h2>
+      <div class="content-wrapper py-32 lg:p-8 lg:w-3/4 post-detail animated fadeIn">
+        <h1 class="text-3xl font-bold lg:mt-16">数据交互 -- Axios 的封装及 API 接口管理</h1>
+        <div class="text-sm text-gray-700 lg:my-8">
+          2020-01-13 / 3 min read
+        </div>
+        
+          <img class="post-feature-image rounded-lg mx-auto my-4" src="https://toxicfy.github.io//post-images/xiang-mu-axios-de-feng-zhuang-ji-api-jie-kou-guan-li.jpg" alt="">
+        
+        <div class="post-content yue">
+          <p>为了简化数据交互的代码以及后续代码的修改更新维护，在 <code>Vue</code> 项目中我们会需要对 axios 库进行进一步的封装并集中管理 api 数据请求；</p>
+<!-- more -->
+<blockquote>
+<p>axios 本质还是 ajax，不过是为了解决 ajax 繁琐的请求方式以及更好的处理回调； axios 是由 ajax 和 promise 封装的 HTTP 库; 主要分为配置 axios/请求及响应的处理/api 接口的管理</p>
+</blockquote>
+<p>首先考虑在 src 文件目录下建立文件夹及文件夹 api/http.js</p>
+<p>我们代码的封装就在 http.js 内完成，为了防止 axios 被全局'污染'，我们通过创建 axios 实例和配置项开始；</p>
+<h3 id="axios-封装">Axios 封装</h3>
+<h4 id="区分环境-baseurl超时请求头格式修改">区分环境 baseURL/超时/请求头格式修改</h4>
+<pre><code class="language-javascript">import axios from 'axios'
+import qs from 'qs'
+
+const service = axios.create{
+    // 区分状态，更换不同的URL
+    baseURL: process.env.NODE_ENV === 'production' ? 'productionUrl' : 'devUrl',
+    // 设置超时时间
+    timeOut: 10000,
+}
+// 设置post的请求头格式
+service.defaults.headers.post['Content-Type'] =
+  'application/x-www-form-urlencoded;charset=UTF-8';
+</code></pre>
+<h4 id="请求-响应处理拦截器">请求、响应处理拦截器</h4>
+<ul>
+<li><code>transformRequest</code> 允许在向服务器发送请求前，修改请求数据；<code>transformResponse</code> 在传递给 then/catch 前，允许修改响应数据</li>
+<li>axios 提供了 <code>validateStatus</code> 属性，用于定义对于给定的<code>HTTP</code> 响应状态码是 <code>resolve</code> 或 <code>reject</code> promise。 这里提及但是可以不作修改，默认 <code>status &gt;= 200 &amp;&amp; status &lt; 300</code> , 其他状态均在 <code>onReject</code> 中进行处理；</li>
+</ul>
+<pre><code class="language-javascript">import router from '../router'
+
+// 序列化数据请求
+service.defaults.transformRequest = data =&gt; qs.stringify(data)
+
+const backToLogin = () =&gt; {
+  router.replace({ path: '/login' })
+}
+
+// 根据 status 生成 msg及操作
+const handleErrStatus = status =&gt; {
+  switch (status) {
+    case 401:
+      backToLogin()
+      return '未授权，请重新登录'
+    case 403:
+      localStorage.removeItem('token')
+      store.commit('clearToken')
+      backToLogin()
+      return '登录过期，请重新登录'
+    case 404:
+      return '请求的资源不存在'，
+  }
+  String(status).match(/^(5)/) &amp;&amp; return '服务端出错，请联系管理员'
+}
+</code></pre>
+<pre><code class="language-javascript">// 提示
+import { Toast } from 'vant'
+const showMsg = msg =&gt;
+  Toast({ message: msg, duration: 1000, forbidClick: true })
+
+// 处理请求部分的拦截
+service.interceptor.request.use(
+  config =&gt; {
+    // 获取并设置 token
+    const token = store.state.token || localStorage.getItem('token')
+    token &amp;&amp; (config.header.Authorization = token)
+    return config
+  },
+  err =&gt; {
+    Promise.error(err)
+  }
+)
+// 处理数据的响应
+service.interceptor.response.use(
+  res =&gt; res,
+  error =&gt; {
+    const { response } = error
+    // 如果有response，则说明该请求已发起，但是错误
+    if (response) {
+      // 全局提示
+      showMsg(handleErrStatus(response.status))
+      return Promise.resolve(response)
+    }
+    return Promise.reject(error)
+  }
+)
+</code></pre>
+
+        </div>
+
+        
+          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://toxicfy.github.io/tag/front-end">
+            <span class="flex-auto">前端</span>
+          </a>
         
 
-        <div class="archives-container">
+
+        <div class="flex justify-between py-8">
           
-            <h2 class="text-gray-600 py-4 animated fadeIn">
-              <i class="remixicon-map-pin-time-line"></i>
-              2020
-            </h2>
-            
-              
-                <a href="https://toxicfy.github.io/post/xiang-mu-axios-de-feng-zhuang-ji-api-jie-kou-guan-li" class="post">
-                  <h2 class="inline-block font-bold text-lg post-title animated fadeIn">
-                    数据交互 -- Axios 的封装及 API 接口管理
-                  </h2>
-                </a>
-                <div class="text-sm font-light mt-3 mb-6 text-gray-400 animated fadeInDown" style="animation-delay: 0.4s">2020-01-13</div>
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
+
           
-            <h2 class="text-gray-600 py-4 animated fadeIn">
-              <i class="remixicon-map-pin-time-line"></i>
-              2019
-            </h2>
-            
-              
-            
-              
-                <a href="https://toxicfy.github.io/post/shu-ji-zong-jie-tu-jie-http" class="post">
-                  <h2 class="inline-block font-bold text-lg post-title animated fadeIn">
-                    书籍笔录  --《图解HTTP》
-                  </h2>
-                </a>
-                <div class="text-sm font-light mt-3 mb-6 text-gray-400 animated fadeInDown" style="animation-delay: 0.4s">2019-10-09</div>
-              
-            
-              
-                <a href="https://toxicfy.github.io/post/vue-koa2-login-regisiter" class="post">
-                  <h2 class="inline-block font-bold text-lg post-title animated fadeIn">
-                    前后端协作 -- 基于 JWT 实现登录注册及鉴权
-                  </h2>
-                </a>
-                <div class="text-sm font-light mt-3 mb-6 text-gray-400 animated fadeInDown" style="animation-delay: 0.4s">2019-07-19</div>
-              
-            
-              
-                <a href="https://toxicfy.github.io/post/historyIllegale" class="post">
-                  <h2 class="inline-block font-bold text-lg post-title animated fadeIn">
-                    项目维护 -- 历史违建处理模块
-                  </h2>
-                </a>
-                <div class="text-sm font-light mt-3 mb-6 text-gray-400 animated fadeInDown" style="animation-delay: 0.4s">2019-05-09</div>
-              
-            
-              
-                <a href="https://toxicfy.github.io/post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong" class="post">
-                  <h2 class="inline-block font-bold text-lg post-title animated fadeIn">
-                    项目总结 -- webAr建筑管理系统
-                  </h2>
-                </a>
-                <div class="text-sm font-light mt-3 mb-6 text-gray-400 animated fadeInDown" style="animation-delay: 0.4s">2019-01-23</div>
-              
-            
-              
-            
-          
-            <h2 class="text-gray-600 py-4 animated fadeIn">
-              <i class="remixicon-map-pin-time-line"></i>
-              2018
-            </h2>
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-                <a href="https://toxicfy.github.io/post/xiang-mu-zong-jie-zhi-hui-qiao-liang" class="post">
-                  <h2 class="inline-block font-bold text-lg post-title animated fadeIn">
-                    项目总结 -- 智慧桥梁
-                  </h2>
-                </a>
-                <div class="text-sm font-light mt-3 mb-6 text-gray-400 animated fadeInDown" style="animation-delay: 0.4s">2018-03-14</div>
-              
-            
+            <div class="next-post">
+              <a href="https://toxicfy.github.io/post/shu-ji-zong-jie-tu-jie-http">
+                <h3 class="post-title">
+                  书籍笔录  --《图解HTTP》
+                  <i class="remixicon-arrow-right-line"></i>
+                </h3>
+              </a>
+            </div>
           
         </div>
 
-        <div>
-          <div class="pagination-container animated fadeIn">
-  
-  
-</div>
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
 
-        </div>
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '972d46b2bdee9b64974d',
+    clientSecret: '1e1d55e34cefa26773f1e9490300ca5d08bb13b9',
+    repo: 'toxicfy.github.io',
+    owner: 'fy',
+    admin: ['fy'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
       </div>
     </div>
 

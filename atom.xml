@@ -2,17 +2,112 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://toxicfy.github.io/</id>
     <title>Fy的个人小站</title>
-    <updated>2019-10-18T09:17:44.576Z</updated>
+    <updated>2020-01-14T03:24:28.700Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://toxicfy.github.io/"/>
-    <link rel="self" href="https://toxicfy.github.io//atom.xml"/>
-    <logo>https://toxicfy.github.io//images/avatar.png</logo>
-    <icon>https://toxicfy.github.io//favicon.ico</icon>
-    <rights>All rights reserved 2019, Fy的个人小站</rights>
+    <link rel="self" href="https://toxicfy.github.io/atom.xml"/>
+    <logo>https://toxicfy.github.io/images/avatar.png</logo>
+    <icon>https://toxicfy.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2020, Fy的个人小站</rights>
+    <entry>
+        <title type="html"><![CDATA[数据交互 -- Axios 的封装及 API 接口管理]]></title>
+        <id>https://toxicfy.github.io/post/xiang-mu-axios-de-feng-zhuang-ji-api-jie-kou-guan-li</id>
+        <link href="https://toxicfy.github.io/post/xiang-mu-axios-de-feng-zhuang-ji-api-jie-kou-guan-li">
+        </link>
+        <updated>2020-01-13T07:33:49.000Z</updated>
+        <summary type="html"><![CDATA[<p>为了简化数据交互的代码以及后续代码的修改更新维护，在 <code>Vue</code> 项目中我们会需要对 axios 库进行进一步的封装并集中管理 api 数据请求；</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>为了简化数据交互的代码以及后续代码的修改更新维护，在 <code>Vue</code> 项目中我们会需要对 axios 库进行进一步的封装并集中管理 api 数据请求；</p>
+<!-- more -->
+<blockquote>
+<p>axios 本质还是 ajax，不过是为了解决 ajax 繁琐的请求方式以及更好的处理回调； axios 是由 ajax 和 promise 封装的 HTTP 库; 主要分为配置 axios/请求及响应的处理/api 接口的管理</p>
+</blockquote>
+<p>首先考虑在 src 文件目录下建立文件夹及文件夹 api/http.js</p>
+<p>我们代码的封装就在 http.js 内完成，为了防止 axios 被全局'污染'，我们通过创建 axios 实例和配置项开始；</p>
+<h3 id="axios-封装">Axios 封装</h3>
+<h4 id="区分环境-baseurl超时请求头格式修改">区分环境 baseURL/超时/请求头格式修改</h4>
+<pre><code class="language-javascript">import axios from 'axios'
+import qs from 'qs'
+
+const service = axios.create{
+    // 区分状态，更换不同的URL
+    baseURL: process.env.NODE_ENV === 'production' ? 'productionUrl' : 'devUrl',
+    // 设置超时时间
+    timeOut: 10000,
+}
+// 设置post的请求头格式
+service.defaults.headers.post['Content-Type'] =
+  'application/x-www-form-urlencoded;charset=UTF-8';
+</code></pre>
+<h4 id="请求-响应处理拦截器">请求、响应处理拦截器</h4>
+<ul>
+<li><code>transformRequest</code> 允许在向服务器发送请求前，修改请求数据；<code>transformResponse</code> 在传递给 then/catch 前，允许修改响应数据</li>
+<li>axios 提供了 <code>validateStatus</code> 属性，用于定义对于给定的<code>HTTP</code> 响应状态码是 <code>resolve</code> 或 <code>reject</code> promise。 这里提及但是可以不作修改，默认 <code>status &gt;= 200 &amp;&amp; status &lt; 300</code> , 其他状态均在 <code>onReject</code> 中进行处理；</li>
+</ul>
+<pre><code class="language-javascript">import router from '../router'
+
+// 序列化数据请求
+service.defaults.transformRequest = data =&gt; qs.stringify(data)
+
+const backToLogin = () =&gt; {
+  router.replace({ path: '/login' })
+}
+
+// 根据 status 生成 msg及操作
+const handleErrStatus = status =&gt; {
+  switch (status) {
+    case 401:
+      backToLogin()
+      return '未授权，请重新登录'
+    case 403:
+      localStorage.removeItem('token')
+      store.commit('clearToken')
+      backToLogin()
+      return '登录过期，请重新登录'
+    case 404:
+      return '请求的资源不存在'，
+  }
+  String(status).match(/^(5)/) &amp;&amp; return '服务端出错，请联系管理员'
+}
+</code></pre>
+<pre><code class="language-javascript">// 提示
+import { Toast } from 'vant'
+const showMsg = msg =&gt;
+  Toast({ message: msg, duration: 1000, forbidClick: true })
+
+// 处理请求部分的拦截
+service.interceptor.request.use(
+  config =&gt; {
+    // 获取并设置 token
+    const token = store.state.token || localStorage.getItem('token')
+    token &amp;&amp; (config.header.Authorization = token)
+    return config
+  },
+  err =&gt; {
+    Promise.error(err)
+  }
+)
+// 处理数据的响应
+service.interceptor.response.use(
+  res =&gt; res,
+  error =&gt; {
+    const { response } = error
+    // 如果有response，则说明该请求已发起，但是错误
+    if (response) {
+      // 全局提示
+      showMsg(handleErrStatus(response.status))
+      return Promise.resolve(response)
+    }
+    return Promise.reject(error)
+  }
+)
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[书籍笔录  --《图解HTTP》]]></title>
-        <id>https://toxicfy.github.io//post/shu-ji-zong-jie-tu-jie-http</id>
-        <link href="https://toxicfy.github.io//post/shu-ji-zong-jie-tu-jie-http">
+        <id>https://toxicfy.github.io/post/shu-ji-zong-jie-tu-jie-http</id>
+        <link href="https://toxicfy.github.io/post/shu-ji-zong-jie-tu-jie-http">
         </link>
         <updated>2019-10-09T02:42:04.000Z</updated>
         <summary type="html"><![CDATA[<p>工作打交道最多的还是浏览器，对于输入<code>URL</code>到页面呈现的步骤类似的文章其实也是看了不少，但是还是觉得差点什么；最后选了《图解HTTP》这本书，基本也覆盖了<code>HTTP</code>协议中的大部分内容，自己也进行了知识点提炼和总结，在这里记录一下；</p>
@@ -24,11 +119,11 @@
 <h3 id="tcpip-协议族">📌<code>TCP/IP</code> 协议族</h3>
 <p>为了满足不同的硬件、操作系统之间的通信，需要制定约束的规则，而这些规则也就称为<strong>协议</strong>；而 <code>TCP/IP</code> 指的是 <code>TCP</code> 和 <code>IP</code> 两种协议，也有说法是 <code>IP</code> 协议通信过程中，使用到的协议族的统称。</p>
 <p><code>TCP/IP</code> 协议族是<strong>基于分层进行管理</strong>的，分层化的设计使得改动以及任务划分更加清晰；</p>
-<figure data-type="image" tabindex="1"><img src="https://pic.superbed.cn/item/5d9da3b2451253d178933125.png" alt="TCP/IP分层"></figure>
+<figure data-type="image" tabindex="1"><img src="https://pic.superbed.cn/item/5d9da3b2451253d178933125.png" alt="TCP/IP分层" loading="lazy"></figure>
 <p>在发送请求的时候，客户端在<strong>应用层</strong>（<code>HTTP</code>协议）发出一个请求，生成请求的<code>HTTP</code>报文，为了传输方便，在<strong>传输层</strong>（<code>TCP</code>协议）将获取到的报文切割成报文段转发给<strong>网络层</strong>（IP协议），搜索对方的地址后转发给<strong>链路层</strong>； 同样的服务器端按照倒序，直到服务端应用层接收重组出HTTP报文，请求才算接受完成。</p>
 <h3 id="tcp的确保可靠性">📌TCP的确保可靠性</h3>
 <p>相比较<code>UDP</code>为面向非连接的协议，<code>TCP</code>协议则是在发送数据前需要建立可靠的连接；通常<code>TCP</code>协议通过三次握手的策略以及<code>Flag</code>（<code>SYN</code>，<code>ACK</code>）标志来保证通信的可靠性。</p>
-<figure data-type="image" tabindex="2"><img src="https://pic.superbed.cn/item/5d9daa02451253d178972142.png" alt="三次握手"></figure>
+<figure data-type="image" tabindex="2"><img src="https://pic.superbed.cn/item/5d9daa02451253d178972142.png" alt="三次握手" loading="lazy"></figure>
 <ul>
 <li>发送端首先发送一个带 <code>SYN</code> 标志的数据包给对方</li>
 <li>接收端收到后，回传一个带有 <code>SYN/ACK</code> 标志的数据包以示传达确认信息</li>
@@ -72,8 +167,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[前后端协作 -- 基于 JWT 实现登录注册及鉴权]]></title>
-        <id>https://toxicfy.github.io//post/vue-koa2-login-regisiter</id>
-        <link href="https://toxicfy.github.io//post/vue-koa2-login-regisiter">
+        <id>https://toxicfy.github.io/post/vue-koa2-login-regisiter</id>
+        <link href="https://toxicfy.github.io/post/vue-koa2-login-regisiter">
         </link>
         <updated>2019-07-19T06:05:40.000Z</updated>
         <summary type="html"><![CDATA[<p>因为公司的服务端是 <code>C#</code>, 之前快速开发的应用使用前后端耦合开发；由于目前项目已经前后端分离开发。<br>
@@ -89,7 +184,7 @@
 <blockquote>
 <p>除了静态数据以及登录注册，其他接口的访问均需要 <code>Header</code> 携带 <code>token</code>值，以便于服务端进行 <code>token</code> 校验后返回需要的数据, 进而完成数据交互</p>
 </blockquote>
-<figure data-type="image" tabindex="1"><img src="https://ae01.alicdn.com/kf/HTB14xWWaKP2gK0jSZFo761uIVXaK.png" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://ae01.alicdn.com/kf/HTB14xWWaKP2gK0jSZFo761uIVXaK.png" alt="" loading="lazy"></figure>
 <h2 id="前端实现">前端实现</h2>
 <hr>
 <p>关于页面的实现数据提交获取以及 <code>Vuex</code> 的使用比较简单，这里不进行介绍；前端部分主要记录路由部分的控制和 <code>axios</code> 拦截的实现</p>
@@ -363,8 +458,8 @@ module.exports = {
     </entry>
     <entry>
         <title type="html"><![CDATA[项目维护 -- 历史违建处理模块]]></title>
-        <id>https://toxicfy.github.io//post/historyIllegale</id>
-        <link href="https://toxicfy.github.io//post/historyIllegale">
+        <id>https://toxicfy.github.io/post/historyIllegale</id>
+        <link href="https://toxicfy.github.io/post/historyIllegale">
         </link>
         <updated>2019-05-09T08:26:58.000Z</updated>
         <summary type="html"><![CDATA[<p>这是项目维护期中需要添加的功能模块：其实可以算是在原有的系统上添加一个小型的管理系统了；这里从文件上传、iframe页面数据访问，数据渲染部分总结一下；</p>
@@ -398,7 +493,7 @@ $('#historyIllegaleModal').on('shown.bs.modal', e =&gt; {
 </code></pre>
 <h3 id="卫片对比区域渲染">卫片对比区域渲染</h3>
 <p>在触发卫片对比功能中中依据主页面选中需要渲染的类型，其中绘制行政区划部分（为文字标注和区域划分两个部分）;</p>
-<figure data-type="image" tabindex="1"><img src="https://toxicfy.github.io//post-images/1557892099842.png" alt="process"></figure>
+<figure data-type="image" tabindex="1"><img src="https://toxicfy.github.io//post-images/1557892099842.png" alt="process" loading="lazy"></figure>
 <blockquote>
 <p>构建标注图层</p>
 </blockquote>
@@ -588,8 +683,8 @@ childWindow.subFunction(); //执行子页面的方法
     </entry>
     <entry>
         <title type="html"><![CDATA[项目总结 -- webAr建筑管理系统]]></title>
-        <id>https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong</id>
-        <link href="https://toxicfy.github.io//post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong">
+        <id>https://toxicfy.github.io/post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong</id>
+        <link href="https://toxicfy.github.io/post/xiang-mu-zong-jie-webar-jian-zhu-guan-li-xi-tong">
         </link>
         <updated>2019-01-23T01:31:27.000Z</updated>
         <summary type="html"><![CDATA[<blockquote>
@@ -801,8 +896,8 @@ export default {
     </entry>
     <entry>
         <title type="html"><![CDATA[项目总结 -- 智慧桥梁]]></title>
-        <id>https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang</id>
-        <link href="https://toxicfy.github.io//post/xiang-mu-zong-jie-zhi-hui-qiao-liang">
+        <id>https://toxicfy.github.io/post/xiang-mu-zong-jie-zhi-hui-qiao-liang</id>
+        <link href="https://toxicfy.github.io/post/xiang-mu-zong-jie-zhi-hui-qiao-liang">
         </link>
         <updated>2018-03-14T01:59:31.000Z</updated>
         <summary type="html"><![CDATA[<blockquote>

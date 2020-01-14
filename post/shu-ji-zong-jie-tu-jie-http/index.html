@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Fy的个人小站</title>
 <meta name="description" content="" />
-<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1571366279967">
+<link rel="shortcut icon" href="https://toxicfy.github.io//favicon.ico?v=1578972255694">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link href="https://cdn.remixicon.com/releases/v1.3.1/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
@@ -24,7 +24,7 @@
       <div class="flex lg:block p-4 lg:px-0 items-center fixed lg:static lg:block top-0 right-0 left-0 bg-white z-50">
         <i class="remixicon-menu-2-line lg:mt-4 text-2xl cursor-pointer animated fadeIn" onclick="openMenu()"></i>
         <a href="https://toxicfy.github.io/">
-          <img class="animated fadeInLeft avatar rounded-lg mx-4 lg:mt-32 lg:mx-0 mt-0 lg:w-24 lg:h-24 w-12 w-12" src="https://toxicfy.github.io//images/avatar.png?v=1571366279967" alt="">
+          <img class="animated fadeInLeft avatar rounded-lg mx-4 lg:mt-32 lg:mx-0 mt-0 lg:w-24 lg:h-24 w-12 w-12" src="https://toxicfy.github.io//images/avatar.png?v=1578972255694" alt="">
         </a>
         <h1 class="animated fadeInLeft lg:text-4xl font-extrabold lg:mt-8 mt-0 text-xl" style="animation-delay: 0.2s">Fy的个人小站</h1>
       </div>
@@ -115,11 +115,11 @@
 <h3 id="tcpip-协议族">📌<code>TCP/IP</code> 协议族</h3>
 <p>为了满足不同的硬件、操作系统之间的通信，需要制定约束的规则，而这些规则也就称为<strong>协议</strong>；而 <code>TCP/IP</code> 指的是 <code>TCP</code> 和 <code>IP</code> 两种协议，也有说法是 <code>IP</code> 协议通信过程中，使用到的协议族的统称。</p>
 <p><code>TCP/IP</code> 协议族是<strong>基于分层进行管理</strong>的，分层化的设计使得改动以及任务划分更加清晰；</p>
-<figure data-type="image" tabindex="1"><img src="https://pic.superbed.cn/item/5d9da3b2451253d178933125.png" alt="TCP/IP分层"></figure>
+<figure data-type="image" tabindex="1"><img src="https://pic.superbed.cn/item/5d9da3b2451253d178933125.png" alt="TCP/IP分层" loading="lazy"></figure>
 <p>在发送请求的时候，客户端在<strong>应用层</strong>（<code>HTTP</code>协议）发出一个请求，生成请求的<code>HTTP</code>报文，为了传输方便，在<strong>传输层</strong>（<code>TCP</code>协议）将获取到的报文切割成报文段转发给<strong>网络层</strong>（IP协议），搜索对方的地址后转发给<strong>链路层</strong>； 同样的服务器端按照倒序，直到服务端应用层接收重组出HTTP报文，请求才算接受完成。</p>
 <h3 id="tcp的确保可靠性">📌TCP的确保可靠性</h3>
 <p>相比较<code>UDP</code>为面向非连接的协议，<code>TCP</code>协议则是在发送数据前需要建立可靠的连接；通常<code>TCP</code>协议通过三次握手的策略以及<code>Flag</code>（<code>SYN</code>，<code>ACK</code>）标志来保证通信的可靠性。</p>
-<figure data-type="image" tabindex="2"><img src="https://pic.superbed.cn/item/5d9daa02451253d178972142.png" alt="三次握手"></figure>
+<figure data-type="image" tabindex="2"><img src="https://pic.superbed.cn/item/5d9daa02451253d178972142.png" alt="三次握手" loading="lazy"></figure>
 <ul>
 <li>发送端首先发送一个带 <code>SYN</code> 标志的数据包给对方</li>
 <li>接收端收到后，回传一个带有 <code>SYN/ACK</code> 标志的数据包以示传达确认信息</li>
@@ -163,11 +163,11 @@
         </div>
 
         
-          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://toxicfy.github.io//tag/Fom-eFNqj">
+          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://toxicfy.github.io/tag/Fom-eFNqj">
             <span class="flex-auto">读书笔记</span>
           </a>
         
-          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://toxicfy.github.io//tag/0k6scQBDK">
+          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://toxicfy.github.io/tag/0k6scQBDK">
             <span class="flex-auto">计算机网络</span>
           </a>
         
@@ -175,10 +175,19 @@
 
         <div class="flex justify-between py-8">
           
+            <div class="prev-post">
+              <a href="https://toxicfy.github.io/post/xiang-mu-axios-de-feng-zhuang-ji-api-jie-kou-guan-li">
+                <h3 class="post-title">
+                  <i class="remixicon-arrow-left-line"></i>
+                  数据交互 -- Axios 的封装及 API 接口管理
+                </h3>
+              </a>
+            </div>
+          
 
           
             <div class="next-post">
-              <a href="https://toxicfy.github.io//post/vue-koa2-login-regisiter">
+              <a href="https://toxicfy.github.io/post/vue-koa2-login-regisiter">
                 <h3 class="post-title">
                   前后端协作 -- 基于 JWT 实现登录注册及鉴权
                   <i class="remixicon-arrow-right-line"></i>
