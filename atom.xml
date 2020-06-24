@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://toxicfy.github.io/</id>
     <title>Fy的个人小站</title>
-    <updated>2020-06-23T02:42:06.129Z</updated>
+    <updated>2020-06-24T02:34:16.117Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://toxicfy.github.io/"/>
     <link rel="self" href="https://toxicfy.github.io/atom.xml"/>
@@ -16,10 +16,10 @@
         </link>
         <updated>2020-06-23T01:25:11.000Z</updated>
         <summary type="html"><![CDATA[<p>为了更好的减少底层库变动对业务代码的影响，所以对于调用及操作场景的部分做了代码重构。 经历了两个多月的代码重构（实际也是新开一个项目），维护一个基础应用平台。<br>
-在重构的过程当中，使用了一些设计模式的理念，这里记录并回顾一下这些常用的涉及模式</p>
+在重构的过程当中，使用了一些设计模式的理念，这里记录并回顾一下这些常用的设计模式</p>
 ]]></summary>
         <content type="html"><![CDATA[<p>为了更好的减少底层库变动对业务代码的影响，所以对于调用及操作场景的部分做了代码重构。 经历了两个多月的代码重构（实际也是新开一个项目），维护一个基础应用平台。<br>
-在重构的过程当中，使用了一些设计模式的理念，这里记录并回顾一下这些常用的涉及模式</p>
+在重构的过程当中，使用了一些设计模式的理念，这里记录并回顾一下这些常用的设计模式</p>
 <!-- more -->
 <h2 id="项目中的变化">项目中的变化</h2>
 <h3 id="before">Before</h3>
